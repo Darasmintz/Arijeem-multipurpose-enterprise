@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Services - Arijeem Enterprises</title>
+    <link rel="icon" type="image/x-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Pepsi_2023.svg/640px-Pepsi_2023.svg.png">
+    <style>
+        /* Shared navigation + animations (matches teams.html nav + order.html animations) */
+
+:root{
+  --primary:#004B93; --secondary:#FF0000; --accent:#FFD700;
+  --light:#f8f9fa; --dark:#212529; --success:#28a745;
+  --pepsi-blue:#004B93; --pepsi-red:#FF0000;
+}
+
+/* Header & nav */
+.header{
+  background: linear-gradient(135deg,var(--primary) 0%,#002954 100%);
+  color:#fff;padding:1rem 0;position:fixed;width:100%;top:0;z-index:1000;
+  box-shadow:0 4px 20px rgba(0,0,0,0.1);
+}
+.container{max-width:1200px;margin:0 auto;padding:0 20px;}
+.nav-container{display:flex;justify-content:space-between;align-items:center;}
+.logo-container{display:flex;align-items:center;gap:15px;}
+.logo{height:45px;width:45px;background:#fff;border-radius:50%;padding:5px;box-shadow:0 0 10px rgba(255,255,255,0.3);transition:transform .3s;}
+.logo:hover{transform:scale(1.05);}
+.company-name{font-size:1.5rem;font-weight:700;color:#fff;}
+.mobile-menu-btn{display:none;background:none;border:none;color:white;font-size:1.8rem;cursor:pointer;}
+
+/* Nav links */
+.nav-links{display:flex;gap:2rem;list-style:none;}
+.nav-links a{color:white;text-decoration:none;font-weight:500;padding:.5rem 1rem;border-radius:4px;transition:all .3s;display:flex;align-items:center;gap:8px;}
+.nav-links a i{font-size:1.1rem;}
+.nav-links a:hover{background:rgba(255,255,255,0.12);transform:translateY(-2px);}
+
+/* Responsive nav behavior */
+@media(max-width:768px){
+  .mobile-menu-btn{display:block;}
+  .nav-links{display:none;position:absolute;top:100%;left:0;width:100%;background:var(--primary);flex-direction:column;padding:1rem;box-shadow:0 10px 20px rgba(0,0,0,0.1);}
+  .nav-links.active{display:flex;}
+}
+
+/* Consistent small animations & toasts used across pages */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeInDown{from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:none}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+@keyframes slideInLeft{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:none}}
+@keyframes slideInRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+@keyframes slideInDown{from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:none}}
+@keyframes slideInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+@keyframes bounce{0%,20%,50%,80%,100%{transform:translateY(0)}40%{transform:translateY(-10px)}60%{transform:translateY(-5px)}}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
+
+/* Toast */
+.toast{position:fixed;top:100px;right:20px;padding:12px 18px;border-radius:10px;color:#fff;z-index:3000;animation:slideInRight .3s}
+.toast.success{background:linear-gradient(135deg,var(--success),#1e7e34)}
+.toast.error{background:linear-gradient(135deg,#dc3545,#bd2130)}
+.toast.info{background:linear-gradient(135deg,var(--pepsi-blue),#003366)}
+
+/* Small helper classes used by nav scripts */
+.nav-active{transform:translateY(-3px);}
+
+/* ensure consistent focus/hover for nav buttons */
+.nav-links a:focus{outline:2px solid rgba(255,255,255,0.12);outline-offset:2px}
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: var(--light);
+        }
+        
+        /* Header & Navigation */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, #002954 100%);
+            color: white;
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo {
+            height: 45px;
+            width: 45px;
+            background: white;
+            border-radius: 50%;
+            padding: 5px;
+            box-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
+        
+        .company-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-links a i {
+            font-size: 1.1rem;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+        }
+        
+        /* Services Hero */
+        .services-hero {
+            background: linear-gradient(rgba(0,43,84,0.85), rgba(0,43,84,0.9)), url('https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 140px 0 60px;
+            text-align: center;
+            margin-top: 73px;
+        }
+        
+        .services-hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .services-hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            opacity: 0.95;
+        }
+        
+        /* Services Grid */
+        .services-grid {
+            padding: 80px 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 3rem;
+        }
+        
+        .services-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            margin-top: 40px;
+        }
+        
+        .service-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+        }
+        
+        .service-image {
+            height: 220px;
+            width: 100%;
+            object-fit: cover;
+        }
+        
+        .service-content {
+            padding: 30px;
+        }
+        
+        .service-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .service-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+            font-weight: 700;
+        }
+        
+        .service-features {
+            list-style: none;
+            margin: 20px 0;
+        }
+        
+        .service-features li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .service-features li i {
+            color: var(--success);
+        }
+        
+        /* Service Highlights */
+        .service-highlights {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 80px 0;
+        }
+        
+        .highlight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .highlight-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+        }
+        
+        .highlight-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .highlight-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--primary) 0%, #002954 100%);
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+        
+        .cta-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .cta-title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .cta-button {
+            padding: 15px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .cta-button.primary {
+            background: white;
+            color: var(--primary);
+        }
+        
+        .cta-button.secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--primary);
+            color: white;
+            padding: 60px 0 30px;
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-section h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 10px;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: var(--primary);
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            }
+            
+            .nav-links.active {
+                display: flex;
+            }
+            
+            .services-hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .cta-button {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .services-hero h1 {
+                font-size: 1.8rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .services-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .service-card {
+                padding: 20px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header & Navigation -->
+    <header class="header">
+        <div class="container">
+            <nav class="nav-container">
+                <div class="logo-container">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Pepsi_2023.svg/640px-Pepsi_2023.svg.png" alt="Arijeem Logo" class="logo">
+                    <span class="company-name">Arijeem Enterprises</span>
+                </div>
+                
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+               <ul class="nav-links" id="navLinks">
+                    <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="services.html"><i class="fas fa-concierge-bell"></i> Services</a></li>
+                    <li><a href="products.html"><i class="fas fa-wine-bottle"></i> Products</a></li>
+                    <li><a href="order.html"><i class="fas fa-shopping-cart"></i> Order</a></li>
+                    <li><a href="contact.html"><i class="fas fa-phone"></i> Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Services Hero -->
+    <section class="services-hero">
+        <div class="container">
+            <h1>Comprehensive Beverage Solutions</h1>
+            <p>From wholesale distribution to retail supply, we provide end-to-end beverage solutions for businesses and individuals across Nigeria.</p>
+        </div>
+    </section>
+
+    <!-- Services Grid -->
+    <section class="services-grid">
+        <div class="container">
+            <h2 class="section-title">Our Core Services</h2>
+            
+            <div class="services-container">
+                <!-- Wholesale Distribution -->
+                <div class="service-card">
+                    <img src="whole.png" alt="Wholesale Distribution" class="service-image">
+                    <div class="service-content">
+                        <div class="service-icon">
+                            <i class="fas fa-warehouse"></i>
+                        </div>
+                        <h3 class="service-title">Wholesale Distribution</h3>
+                        <p>Bulk supply of beverages to retailers, supermarkets, and businesses with competitive pricing and reliable delivery schedules.</p>
+                        
+                        <ul class="service-features">
+                            <li><i class="fas fa-check-circle"></i> Bulk order discounts</li>
+                            <li><i class="fas fa-check-circle"></i> Scheduled deliveries</li>
+                            <li><i class="fas fa-check-circle"></i> Volume-based pricing</li>
+                            <li><i class="fas fa-check-circle"></i> Business credit terms</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Retail Supply -->
+                <div class="service-card">
+                    <img src="retail.png" alt="Retail Supply" class="service-image">
+                    <div class="service-content">
+                        <div class="service-icon">
+                            <i class="fas fa-store"></i>
+                        </div>
+                        <h3 class="service-title">Retail Supply</h3>
+                        <p>Individual and small business supply with flexible ordering options and fast delivery to your location.</p>
+                        
+                        <ul class="service-features">
+                            <li><i class="fas fa-check-circle"></i> Small order fulfillment</li>
+                            <li><i class="fas fa-check-circle"></i> Same-day delivery</li>
+                            <li><i class="fas fa-check-circle"></i> Multiple payment options</li>
+                            <li><i class="fas fa-check-circle"></i> Emergency order support</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Bulk Supply Services -->
+                <div class="service-card">
+                    <img src="bulk.png" alt="Bulk Supply" class="service-image">
+                    <div class="service-content">
+                        <div class="service-icon">
+                            <i class="fas fa-truck-loading"></i>
+                        </div>
+                        <h3 class="service-title">Bulk Supply Services</h3>
+                        <p>Specialized solutions for events, weddings, conferences, and large gatherings with customized beverage packages.</p>
+                        
+                        <ul class="service-features">
+                            <li><i class="fas fa-check-circle"></i> Event planning support</li>
+                            <li><i class="fas fa-check-circle"></i> Custom beverage mixes</li>
+                            <li><i class="fas fa-check-circle"></i> Setup and logistics</li>
+                            <li><i class="fas fa-check-circle"></i> Returns management</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Service Highlights -->
+    <section class="service-highlights">
+        <div class="container">
+            <h2 class="section-title">Why Partner With Us</h2>
+            
+            <div class="highlight-grid">
+                <div class="highlight-card">
+                    <div class="highlight-number">24/7</div>
+                    <h3>Order Support</h3>
+                    <p>Round-the-clock order processing and customer support</p>
+                </div>
+                
+                <div class="highlight-card">
+                    <div class="highlight-number">100%</div>
+                    <h3>Authentic Products</h3>
+                    <p>Genuine beverages from authorized distributors</p>
+                </div>
+                
+                <div class="highlight-card">
+                    <div class="highlight-number">Same-Day</div>
+                    <h3>Delivery</h3>
+                    <p>Fast delivery for orders placed before 2pm</p>
+                </div>
+                
+                <div class="highlight-card">
+                    <div class="highlight-number">Flexible</div>
+                    <h3>Payment Options</h3>
+                    <p>Cash, transfer, POS, and credit terms available</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2 class="cta-title">Ready to Streamline Your Beverage Supply?</h2>
+                <p>Whether you're a retailer, event planner, or business owner, we have the solutions to meet your beverage needs efficiently and reliably.</p>
+                
+                <div class="cta-buttons">
+                    <a href="order.html" class="cta-button primary">
+                        <i class="fas fa-shopping-cart"></i> Place Order Now
+                    </a>
+                    <a href="contact.html" class="cta-button secondary">
+                        <i class="fas fa-phone"></i> Contact Our Sales Team
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>Arijeem Enterprises</h3>
+                    <p>Comprehensive beverage solutions for wholesale and retail needs. Reliable, efficient, and professional service.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="order.html">Place Order</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="teams.html"></i>Meet our Team</a></li>
+                        <li><a href="promo-loyalty.html"></i>Explore our Loyalty Programs</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-phone"></i> +234 803 123 4567</li>
+                        <li><i class="fas fa-phone"></i> +234 902 876 5432</li>
+                        <li><i class="fas fa-envelope"></i> services@arijeementerprises.com</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Lagos, Nigeria</li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Service Hours</h3>
+                    <ul class="footer-links">
+                        <li>Monday - Friday: 8am - 6pm</li>
+                        <li>Saturday: 9am - 4pm</li>
+                        <li>Sunday: 10am - 2pm</li>
+                        <li>24/7 Emergency Orders</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2024 Arijeem Multipurpose Enterprises. All rights reserved. | Professional beverage solutions</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile Menu Toggle
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            document.getElementById('navLinks').classList.toggle('active');
+        });
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const navLinks = document.getElementById('navLinks');
+            const menuBtn = document.getElementById('mobileMenuBtn');
+            
+            if (!navLinks.contains(event.target) && !menuBtn.contains(event.target)) {
+                navLinks.classList.remove('active');
+            }
+        });
+        
+        // Add active class to current page link
+        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            const linkPage = link.getAttribute('href');
+            if (linkPage === currentPage) {
+                link.style.background = 'rgba(255,255,255,0.2)';
+                link.style.fontWeight = '600';
+            }
+        });
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Close mobile menu after clicking
+                    document.getElementById('navLinks').classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Products - Arijeem Enterprises</title>
+    <link rel="icon" type="image/x-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Pepsi_2023.svg/640px-Pepsi_2023.svg.png">
+    <style>
+        /* Shared navigation + animations (matches teams.html nav + order.html animations) */
+
+:root{
+  --primary:#004B93; --secondary:#FF0000; --accent:#FFD700;
+  --light:#f8f9fa; --dark:#212529; --success:#28a745;
+  --pepsi-blue:#004B93; --pepsi-red:#FF0000;
+}
+
+/* Header & nav */
+.header{
+  background: linear-gradient(135deg,var(--primary) 0%,#002954 100%);
+  color:#fff;padding:1rem 0;position:fixed;width:100%;top:0;z-index:1000;
+  box-shadow:0 4px 20px rgba(0,0,0,0.1);
+}
+.container{max-width:1200px;margin:0 auto;padding:0 20px;}
+.nav-container{display:flex;justify-content:space-between;align-items:center;}
+.logo-container{display:flex;align-items:center;gap:15px;}
+.logo{height:45px;width:45px;background:#fff;border-radius:50%;padding:5px;box-shadow:0 0 10px rgba(255,255,255,0.3);transition:transform .3s;}
+.logo:hover{transform:scale(1.05);}
+.company-name{font-size:1.5rem;font-weight:700;color:#fff;}
+.mobile-menu-btn{display:none;background:none;border:none;color:white;font-size:1.8rem;cursor:pointer;}
+
+/* Nav links */
+.nav-links{display:flex;gap:2rem;list-style:none;}
+.nav-links a{color:white;text-decoration:none;font-weight:500;padding:.5rem 1rem;border-radius:4px;transition:all .3s;display:flex;align-items:center;gap:8px;}
+.nav-links a i{font-size:1.1rem;}
+.nav-links a:hover{background:rgba(255,255,255,0.12);transform:translateY(-2px);}
+
+/* Responsive nav behavior */
+@media(max-width:768px){
+  .mobile-menu-btn{display:block;}
+  .nav-links{display:none;position:absolute;top:100%;left:0;width:100%;background:var(--primary);flex-direction:column;padding:1rem;box-shadow:0 10px 20px rgba(0,0,0,0.1);}
+  .nav-links.active{display:flex;}
+}
+
+/* Consistent small animations & toasts used across pages */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeInDown{from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:none}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+@keyframes slideInLeft{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:none}}
+@keyframes slideInRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+@keyframes slideInDown{from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:none}}
+@keyframes slideInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+@keyframes bounce{0%,20%,50%,80%,100%{transform:translateY(0)}40%{transform:translateY(-10px)}60%{transform:translateY(-5px)}}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
+
+/* Toast */
+.toast{position:fixed;top:100px;right:20px;padding:12px 18px;border-radius:10px;color:#fff;z-index:3000;animation:slideInRight .3s}
+.toast.success{background:linear-gradient(135deg,var(--success),#1e7e34)}
+.toast.error{background:linear-gradient(135deg,#dc3545,#bd2130)}
+.toast.info{background:linear-gradient(135deg,var(--pepsi-blue),#003366)}
+
+/* Small helper classes used by nav scripts */
+.nav-active{transform:translateY(-3px);}
+
+/* ensure consistent focus/hover for nav buttons */
+.nav-links a:focus{outline:2px solid rgba(255,255,255,0.12);outline-offset:2px}
+
+/* Products Hero */
+.products-hero {
+    background: linear-gradient(rgba(0,43,84,0.85), rgba(0,43,84,0.9)), url('https://images.unsplash.com/photo-1598974357801-cbca100e5d10?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    padding: 140px 0 60px;
+    text-align: center;
+    margin-top: 73px;
+}
+        
+.products-hero h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+        
+.category-filter {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 30px;
+}
+        
+.category-btn {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: 2px solid rgba(255,255,255,0.3);
+    padding: 10px 25px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+        
+.category-btn:hover, .category-btn.active {
+    background: white;
+    color: var(--primary);
+    transform: translateY(-2px);
+}
+        
+.category-btn.water { border-color: var(--water); }
+.category-btn.rgb { border-color: var(--rgb); }
+.category-btn.pet { border-color: var(--pet); }
+.category-btn.cans { border-color: var(--cans); }
+        
+/* Product Categories */
+.category-section {
+    padding: 60px 0;
+    display: none;
+}
+        
+.category-section.active {
+    display: block;
+}
+        
+.category-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+        
+.category-icon {
+    font-size: 2.5rem;
+    color: var(--primary);
+}
+        
+.category-title {
+    font-size: 2.2rem;
+    color: var(--primary);
+}
+        
+.category-badge {
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-left: 10px;
+}
+        
+.water-badge { background: var(--water); color: white; }
+.rgb-badge { background: var(--rgb); color: white; }
+.pet-badge { background: var(--pet); color: white; }
+.cans-badge { background: var(--cans); color: var(--dark); }
+        
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 30px;
+}
+        
+.product-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+        
+.product-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+}
+        
+.product-image-container {
+    height: 250px;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+        
+.product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+        
+.product-card:hover .product-image {
+    transform: scale(1.05);
+}
+        
+.product-type {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+        
+.product-info {
+    padding: 25px;
+}
+        
+.product-name {
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+    color: var(--primary);
+    font-weight: 700;
+}
+        
+.product-description {
+    color: #666;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+        
+.price-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+        
+.price-group {
+    text-align: center;
+}
+        
+.price-label {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+        
+.price {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--success);
+}
+        
+.wholesale-price {
+    color: var(--primary);
+}
+        
+.product-actions {
+    display: flex;
+    gap: 10px;
+}
+        
+.order-btn {
+    flex: 1;
+    background: linear-gradient(45deg, var(--secondary), #ff3333);
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+        
+.order-btn:hover {
+    background: linear-gradient(45deg, #ff3333, var(--secondary));
+    transform: translateY(-2px);
+}
+        
+/* Product Legend */
+.product-legend {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    margin-top: 40px;
+}
+        
+.legend-title {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    color: var(--primary);
+}
+        
+.legend-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+        
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+        
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+        
+/* Footer */
+.footer {
+    background: var(--primary);
+    color: white;
+    padding: 60px 0 30px;
+    margin-top: 60px;
+}
+        
+.footer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 40px;
+    margin-bottom: 40px;
+}
+        
+.footer-section h3 {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    color: var(--accent);
+}
+        
+.footer-links {
+    list-style: none;
+}
+        
+.footer-links a {
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+    display: block;
+    margin-bottom: 10px;
+    transition: color 0.3s;
+}
+        
+.footer-links a:hover {
+    color: var(--accent);
+}
+        
+.copyright {
+    text-align: center;
+    padding-top: 30px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.7);
+    font-size: 0.9rem;
+}
+        
+/* Responsive Design */
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: block;
+    }
+    
+    .nav-links {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: var(--primary);
+        flex-direction: column;
+        padding: 1rem;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .nav-links.active {
+        display: flex;
+    }
+    
+    .products-hero h1 {
+        font-size: 2.2rem;
+    }
+    
+    .products-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .category-title {
+        font-size: 1.8rem;
+    }
+}
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header & Navigation -->
+    <header class="header">
+        <div class="container">
+            <nav class="nav-container">
+                <div class="logo-container">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Pepsi_2023.svg/640px-Pepsi_2023.svg.png" alt="Arijeem Logo" class="logo">
+                    <span class="company-name">Arijeem Enterprises</span>
+                </div>
+                
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="services.html"><i class="fas fa-concierge-bell"></i> Services</a></li>
+                    <li><a href="products.html"><i class="fas fa-wine-bottle"></i> Products</a></li>
+                    <li><a href="order.html"><i class="fas fa-shopping-cart"></i> Order</a></li>
+                    <li><a href="contact.html"><i class="fas fa-phone"></i> Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Products Hero -->
+    <section class="products-hero">
+        <div class="container">
+            <h1>Our Premium Beverage Collection</h1>
+            <p>Browse our comprehensive range of quality beverages. Clear product identification to eliminate ordering confusion.</p>
+            
+            <div class="category-filter">
+                <button class="category-btn water active" data-category="water">
+                    <i class="fas fa-tint"></i> Bottled Water
+                </button>
+                <button class="category-btn rgb" data-category="rgb">
+                    <i class="fas fa-wine-bottle"></i> RGB (Returnable Glass)
+                </button>
+                <button class="category-btn pet" data-category="pet">
+                    <i class="fas fa-wine-bottle"></i> PET (Plastic Bottles)
+                </button>
+                <button class="category-btn cans" data-category="cans">
+                    <i class="fas fa-beer"></i> Cans
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Water Category -->
+    <section class="category-section active" id="water-category">
+        <div class="container">
+            <div class="category-header">
+                <div class="category-icon">
+                    <i class="fas fa-tint"></i>
+                </div>
+                <h2 class="category-title">Bottled Water</h2>
+                <span class="category-badge water-badge">PET Bottles</span>
+            </div>
+            
+            <div class="products-grid">
+                <!-- Nirvana Water -->
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <img src="Nirvana.png" alt="Nirvana" class="product-image">
+                        <span class="product-type">Water</span>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">Nirvana</h3>
+                        <p class="product-description">Premium drinking water in PET bottle. Perfect for hydration needs.</p>
+                        
+                        <div class="price-section">
+                            <div class="price-group">
+                                <div class="price-label">Retail (1-49 bottles)</div>
+                                <div class="price">₦1,400</div>
+                            </div>
+                            <div class="price-group">
+                                <div class="price-label">Wholesale (50+ bottles)</div>
+                                <div class="price wholesale-price">₦1,300</div>
+                            </div>
+                        </div>
+                        
+                        <div class="product-actions">
+                            <button class="order-btn" onclick="window.location.href='order.html?product=Nirvana Water'">
+                                <i class="fas fa-shopping-cart"></i> Order Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Eva -->
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <img src="eva.png" alt="Eva" class="product-image">
+                        <span class="product-type">Water</span>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">Eva</h3>
+                        <p class="product-description">Large 1.5L PET bottle for families and extended use.</p>
+                        
+                        <div class="price-section">
+                            <div class="price-group">
+                                <div class="price-label">Retail Price</div>
+                                <div class="price">₦3,600</div>
+                            </div>
+                            <div class="price-group">
+                                <div class="price-label">Wholesale Price</div>
+                                <div class="price wholesale-price">₦3,600</div>
+                            </div>
+                        </div>
+                        
+                        <div class="product-actions">
+                            <button class="order-btn" onclick="window.location.href='order.html?product=Eva Water 1.5L'">
+                                <i class="fas fa-shopping-cart"></i> Order Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Aquafina -->
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <img src="aquafina.png" alt="Aquafina" class="product-image">
+                        <span class="product-type">Water</span>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">Aquafina</h3>
+                        <p class="product-description">Premium purified water in PET bottle.</p>
+                        
+                        <div class="price-section">
+                            <div class="price-group">
+                                <div class="price-label">Retail (1-49 bottles)</div>
+                                <div class="price">₦1,700</div>
+                            </div>
+                            <div class="price-group">
+                                <div class="price-label">Wholesale (50+ bottles)</div>
+                                <div class="price wholesale-price">₦1,650</div>
+                            </div>
+                        </div>
+                        
+                        <div class="product-actions">
+                            <button class="order-btn" onclick="window.location.href='order.html?product=Aquafina 50cl'">
+                                <i class="fas fa-shopping-cart"></i> Order Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Aquafina 75cl (uses same image) -->
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <img src="aquafina.png" alt="Aquafina 75cl" class="product-image">
+                        <span class="product-type">Water</span>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">Aquafina 75cl</h3>
+                        <p class="product-description">Premium purified water in 75cl PET bottle.</p>
+                        
+                        <div class="price-section">
+                            <div class="price-group">
+                                <div class="price-label">Retail (1-49 bottles)</div>
+                                <div class="price">₦2,200</div>
+                            </div>
+                            <div class="price-group">
+                                <div class="price-label">Wholesale (50+ bottles)</div>
+                                <div class="price wholesale-price">₦2,150</div>
+                            </div>
+                        </div>
+                        
+                        <div class="product-actions">
+                            <button class="order-btn" onclick="window.location.href='order.html?product=Aquafina 75cl'">
+                                <i class="fas fa-shopping-cart"></i> Order Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- RGB Category -->
+    <section class="category-section" id="rgb-category">
+        <div class="container">
+            <div class="category-header">
+                <div class="category-icon">
+                    <i class="fas fa-wine-bottle"></i>
+                </div>
+                <h2 class="category-title">Returnable Glass Bottles (RGB)</h2>
+                <span class="category-badge rgb-badge">Returnable</span>
+            </div>
+            
+            <div class="products-grid">
+                <!-- Pepsi RGB -->
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <img src="pep.png" alt="Pep (Pepsi RGB)" class="product-image">
+                        <span class="product-type">RGB</span>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">Pep (Pepsi RGB)</h3>
+                        <p class="product-description">Classic Pepsi cola in returnable glass bottle.</p>
+                        
+                        <div class="price-section">
+                            <div class="price-group">
+                                <div class="price-label">Retail (1-49 bottles)</div>
+                                <div class="price">₦4,500</div>
+                            </div>
+                            <div class="price-group">
+                                <div class="price-label">Wholesale (50+ bottles)</div>
+                                <div class="price wholesale-price">₦4,400</div>
+                            </div>
+                        </div>
+                        
+                        <div class="product-actions">
+                            <button class="order-btn" onclick="window.location.href='order.html?product=Pepsi Glass Bottle'">
+                                <i class="fas fa-shopping-cart"></i> Order Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 7UP RGB -->
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <img src="7up-glass.png" alt="7UP Glass" class="product-image">
+                        <span class="product-type">RGB</span>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">7UP Glass</h3>
+                        <p class="product-description">Refreshing lemon-lime soda in returnable glass bottle.</p>
+                        
+                        <div class="price-section">
+                            <div class="price-group">
+                                <div class="price-label">Retail (1-49 bottles)</div>
+                                <div class="price">₦3,000</div>
+                            </div>
+                            <div class="price-group">
+                                <div class="price-label">Wholesale (50+ bottles)</div>
+                                <div class="price wholesale-price">₦2,950</div>
+                            </div>
+                        </div>
+                        
+                        <div class="product-actions">
+                            <button class="order-btn" onclick="window.location.href='order.html?product=7UP Glass Bottle'">
+                                <i class="fas fa-shopping-cart"></i> Order Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Komma (SK RGB) -->
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <img src="komma.png" alt="Komma (SK RGB)" class="product-image">
+                        <span class="product-type">RGB</span>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">Komma (SK RGB)</h3>
+                        <p class="product-description">Premium soda in returnable glass bottle.</p>
+                        
+                        <div class="price-section">
+                            <div class="price-group">
+                                <div class="price-label">Retail (1-49 bottles)</div>
+                                <div class="price">₦3,120</div>
+                            </div>
+                            <div class="price-group">
+                                <div class="price-label">Wholesale (50+ bottles)</div>
+                                <div class="price wholesale-price">₦3,050</div>
+                            </div>
+                        </div>
+                        
+                        <div class="product-actions">
+                            <button class="order-btn" onclick="window.location.href='order.html?product=SK Glass Bottle'">
+                                <i class="fas fa-shopping-cart"></i> Order Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Big Coke RGB -->
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <img src="bigcokergb.png" alt="Big Coke RGB" class="product-image">
+                        <span class="product-type">RGB</span>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">Big Coke RGB</h3>
+                        <p class="product-description">Large Coca-Cola in returnable glass bottle.</p>
+                        
+                        <div class="price-section">
+                            <div class="price-group">
+                                <div class="price-label">Retail Price</div>
+                                <div class="price">₦6,000</div>
+                            </div>
+                            <div class="price-group">
+                                <div class="price-label">Wholesale Price</div>
+                                <div class="price wholesale-price">₦6,000</div>
+                            </div>
+                        </div>
+                        
+                        <div class="product-actions">
+                            <button class="order-btn" onclick="window.location.href='order.html?product=Big Coke RGB 50cl'">
+                                <i class="fas fa-shopping-cart"></i> Order Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- PET Category -->
+    <section class="category-section" id="pet-category">
+        <div class="container">
+            <div class="category-header">
+                <div class="category-icon">
+                    <i class="fas fa-wine-bottle"></i>
+                </div>
+                <h2 class="category-title">PET Plastic Bottles</h2>
+                <span class="category-badge pet-badge">Plastic</span>
+            </div>
+            
+            <div class="products-grid">
+                <!-- Pepsi PET -->
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <img src="pepsi.png" alt="Pepsi (PET)" class="product-image">
+                        <span class="product-type">PET</span>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">Pepsi (PET)</h3>
+                        <p class="product-description">Classic Pepsi in plastic PET bottle.</p>
+                        
+                        <div class="price-section">
+                            <div class="price-group">
+                                <div class="price-label">Retail Price</div>
+                                <div class="price">₦4,400</div>
+                            </div>
+                            <div class="price-group">
+                                <div class="price-label">Wholesale Price</div>
+                                <div class="price wholesale-price">₦4,400</div>
+                            </div>
+                        </div>
+                        
+                        <div class="product-actions">
+                            <button class="order-btn" onclick="window.location.href='order.html?product=Pepsi (PET)'">
+                                <i class="fas fa-shopping-cart"></i> Order Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Fanta PET -->
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <img src="fanta.png" alt="Fanta (PET)" class="product-image">
+                        <span class="product-type">PET</span>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">Fanta (PET)</h3>
+                        <p class="product-description">Refreshing Fanta in plastic PET bottle.</p>
+                        
+                        <div class="price-section">
+                            <div class="price-group">
+                                <div class="price-label">Retail Price</div>
+                                <div class="price">₦4,400</div>
+                            </div>
+                            <div class="price-group">
+                                <div class="price-label">Wholesale Price</div>
+                                <div class="price wholesale-price">₦4,400</div>
+                            </div>
+                        </div>
+                        
+                        <div class="product-actions">
+                            <button class="order-btn" onclick="window.location.href='order.html?product=Fanta (PET)'">
+                                <i class="fas fa-shopping-cart"></i> Order Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mirinda PET -->
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <img src="mirinda.png" alt="Mirinda (PET)" class="product-image">
+                        <span class="product-type">PET</span>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">Mirinda (PET)</h3>
+                        <p class="product-description">Citrusy Mirinda in plastic PET bottle.</p>
+                        
+                        <div class="price-section">
+                            <div class="price-group">
+                                <div class="price-label">Retail Price</div>
+                                <div class="price">₦4,400</div>
+                            </div>
+                            <div class="price-group">
+                                <div class="price-label">Wholesale Price</div>
+                                <div class="price wholesale-price">₦4,400</div>
+                            </div>
+                        </div>
+                        
+                        <div class="product-actions">
+                            <button class="order-btn" onclick="window.location.href='order.html?product=Mirinda (PET)'">
+                                <i class="fas fa-shopping-cart"></i> Order Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Plastic Coke PET -->
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <img src="plastic-coke.png" alt="Plastic Coke (PET)" class="product-image">
+                        <span class="product-type">PET</span>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">Plastic Coke (PET)</h3>
+                        <p class="product-description">Classic Coke in plastic PET bottle.</p>
+                        
+                        <div class="price-section">
+                            <div class="price-group">
+                                <div class="price-label">Retail Price</div>
+                                <div class="price">₦4,400</div>
+                            </div>
+                            <div class="price-group">
+                                <div class="price-label">Wholesale Price</div>
+                                <div class="price wholesale-price">₦4,400</div>
+                            </div>
+                        </div>
+                        
+                        <div class="product-actions">
+                            <button class="order-btn" onclick="window.location.href='order.html?product=Plastic Coke (PET)'">
+                                <i class="fas fa-shopping-cart"></i> Order Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Big Cola Yellow -->
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <img src="bigcola-yellow.png" alt="Big Cola Yellow" class="product-image">
+                        <span class="product-type">PET</span>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">Big Cola Yellow</h3>
+                        <p class="product-description">Refreshing Big Cola in plastic PET bottle.</p>
+                        
+                        <div class="price-section">
+                            <div class="price-group">
+                                <div class="price-label">Retail Price</div>
+                                <div class="price">₦4,400</div>
+                            </div>
+                            <div class="price-group">
+                                <div class="price-label">Wholesale Price</div>
+                                <div class="price wholesale-price">₦4,400</div>
+                            </div>
+                        </div>
+                        
+                        <div class="product-actions">
+                            <button class="order-btn" onclick="window.location.href='order.html?product=Big Cola Yellow'">
+                                <i class="fas fa-shopping-cart"></i> Order Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Kommando PET -->
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <img src="kommando.png" alt="Kommando (SK PET)" class="product-image">
+                        <span class="product-type">PET</span>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">Kommando (SK PET)</h3>
+                        <p class="product-description">Premium soda in plastic PET bottle.</p>
+                        
+                        <div class="price-section">
+                            <div class="price-group">
+                                <div class="price-label">Retail Price</div>
+                                <div class="price">₦4,400</div>
+                            </div>
+                            <div class="price-group">
+                                <div class="price-label">Wholesale Price</div>
+                                <div class="price wholesale-price">₦4,400</div>
+                            </div>
+                        </div>
+                        
+                        <div class="product-actions">
+                            <button class="order-btn" onclick="window.location.href='order.html?product=Kommando (SK PET)'">
+                                <i class="fas fa-shopping-cart"></i> Order Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 7UP PET -->
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <img src="7up.png" alt="7UP (PET)" class="product-image">
+                        <span class="product-type">PET</span>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">7UP (PET)</h3>
+                        <p class="product-description">Crisp 7UP in plastic PET bottle.</p>
+                        
+                        <div class="price-section">
+                            <div class="price-group">
+                                <div class="price-label">Retail Price</div>
+                                <div class="price">₦4,400</div>
+                            </div>
+                            <div class="price-group">
+                                <div class="price-label">Wholesale Price</div>
+                                <div class="price wholesale-price">₦4,400</div>
+                            </div>
+                        </div>
+                        
+                        <div class="product-actions">
+                            <button class="order-btn" onclick="window.location.href='order.html?product=7UP (PET)'">
+                                <i class="fas fa-shopping-cart"></i> Order Now
+                            </button>
+                        </div>
+                        <!-- America Cola pet -->
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <img src="america-cola.png" alt="America Cola" class="product-image">
+                        <span class="product-type">PET</span>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">America Cola</h3>
+                        <p class="product-description">Classic cola flavor in convenient PET bottle.</p>
+                        
+                        <div class="price-section">
+                            <div class="price-group">
+                                <div class="price-label">Retail (0-49 Plastic Bottles)</div>
+                                <div class="price">₦3,700</div>
+                            </div>
+                            <div class="price-group">
+                                <div class="price-label">Wholesale (50+ Plastic Bottles)</div>
+                                <div class="price wholesale-price">₦3,600</div>
+                            </div>
+                        </div>
+                        
+                        <div class="product-actions">
+                            <button class="order-btn" onclick="window.location.href='order.html?product=America Cola'">
+                                <i class="fas fa-shopping-cart"></i> Order Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Cans Category -->
+    <section class="category-section" id="cans-category">
+        <div class="container">
+            <div class="category-header">
+                <div class="category-icon">
+                    <i class="fas fa-beer"></i>
+                </div>
+                <h2 class="category-title">Beverage Cans</h2>
+                <span class="category-badge cans-badge">Cans</span>
+            </div>
+            
+            <div class="products-grid">
+                <!-- Dubic Malt -->
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <img src="dubic-malt.png" alt="Dubic Malt" class="product-image">
+                        <span class="product-type">Cans</span>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">Dubic Malt</h3>
+                        <p class="product-description">Premium malt beverage in convenient aluminum can.</p>
+                        
+                        <div class="price-section">
+                            <div class="price-group">
+                                <div class="price-label">Retail (1-29 cans)</div>
+                                <div class="price">₦12,000</div>
+                            </div>
+                            <div class="price-group">
+                                <div class="price-label">Wholesale (30+ cans)</div>
+                                <div class="price wholesale-price">₦11,000</div>
+                            </div>
+                        </div>
+                        
+                        <div class="product-actions">
+                            <button class="order-btn" onclick="window.location.href='order.html?product=Dubic Malt'">
+                                <i class="fas fa-shopping-cart"></i> Order Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                
+
+    <!-- Product Legend -->
+    <section class="container">
+        <div class="product-legend">
+            <h3 class="legend-title">Product Type Legend</h3>
+            <div class="legend-items">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: var(--water);"></div>
+                    <div>
+                        <strong>Bottled Water</strong>
+                        <p>Purified drinking water in PET bottles</p>
+                    </div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: var(--rgb);"></div>
+                    <div>
+                        <strong>RGB (Returnable Glass Bottles)</strong>
+                        <p>Glass bottles that can be returned for deposit</p>
+                    </div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: var(--pet);"></div>
+                    <div>
+                        <strong>PET Plastic Bottles</strong>
+                        <p>Disposable plastic beverage bottles</p>
+                    </div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: var(--cans);"></div>
+                    <div>
+                        <strong>Beverage Cans</strong>
+                        <p>Aluminum can packaging</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>Arijeem Enterprises</h3>
+                    <p>Clear product identification. No more ordering confusion. Premium beverages delivered to your doorstep.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="order.html">Place Order</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="teams.html"></i>Meet our Team</a></li>
+                    <li><a href="promo-loyalty.html"></i>Explore our Loyalty Programs</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-phone"></i> +234 803 123 4567</li>
+                        <li><i class="fas fa-phone"></i> +234 902 876 5432</li>
+                        <li><i class="fas fa-envelope"></i> sales@arijeementerprises.com</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Lagos, Nigeria</li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Business Hours</h3>
+                    <ul class="footer-links">
+                        <li>Monday - Friday: 8am - 6pm</li>
+                        <li>Saturday: 9am - 4pm</li>
+                        <li>Sunday: 10am - 2pm</li>
+                        <li>24/7 Emergency Orders Available</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2024 Arijeem Multipurpose Enterprises. All rights reserved. | Clear product identification eliminates ordering errors</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile Menu Toggle
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            document.getElementById('navLinks').classList.toggle('active');
+        });
+        
+        // Category Filtering
+        const categoryButtons = document.querySelectorAll('.category-btn');
+        const categorySections = document.querySelectorAll('.category-section');
+        
+        categoryButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Update active button
+                categoryButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                // Show selected category
+                const category = button.getAttribute('data-category');
+                categorySections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                document.getElementById(`${category}-category`).classList.add('active');
+                
+                // Scroll to category
+                document.getElementById(`${category}-category`).scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            });
+        });
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const navLinks = document.getElementById('navLinks');
+            const menuBtn = document.getElementById('mobileMenuBtn');
+            
+            if (!navLinks.contains(event.target) && !menuBtn.contains(event.target)) {
+                navLinks.classList.remove('active');
+            }
+        });
+        
+        // Add active class to current page link
+        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            const linkPage = link.getAttribute('href');
+            if (linkPage === currentPage) {
+                link.style.background = 'rgba(255,255,255,0.2)';
+                link.style.fontWeight = '600';
+            }
+        });
+        
+        // Preload images with Black people
+        const preloadImages = [
+            'nirvana-water.png',
+            'pepsi-glass-bottle.png',
+            'coke-fanta-pet.png',
+            'dubic-can.png',
+            'products-hero.png'
+        ];
+        
+        // Preload images
+        preloadImages.forEach(src => {
+            const img = new Image();
+            img.src = src;
+        });
+    </script>
+</body>
+</html>

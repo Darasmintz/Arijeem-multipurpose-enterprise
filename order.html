@@ -1,0 +1,2308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Place Order - Arijeem Enterprises</title>
+    <link rel="icon" type="image/x-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Pepsi_2023.svg/640px-Pepsi_2023.svg.png">
+    <style>
+        :root {
+            --pepsi-blue: #004B93;
+            --pepsi-red: #FF0000;
+            --pepsi-white: #FFFFFF;
+            --pepsi-black: #000000;
+            --pepsi-light-blue: #1E90FF;
+            --pepsi-gray: #F8F9FA;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            line-height: 1.6;
+            color: var(--pepsi-black);
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+        }
+        
+        /* Pepsi-Inspired Header */
+        .header {
+            background: linear-gradient(90deg, var(--pepsi-blue) 0%, #003366 100%);
+            color: var(--pepsi-white);
+            padding: 0.8rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border-bottom: 4px solid var(--pepsi-red);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: slideInLeft 0.5s ease-out;
+        }
+        
+        .logo {
+            height: 50px;
+            width: 50px;
+            background: var(--pepsi-white);
+            border-radius: 50%;
+            padding: 5px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+            transition: transform 0.3s ease;
+        }
+        
+        .logo:hover {
+            transform: rotate(360deg);
+            transition: transform 0.6s ease;
+        }
+        
+        .company-name {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--pepsi-white);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 1px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            color: var(--pepsi-white);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.6rem 1.2rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .nav-links a:hover::before {
+            left: 100%;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .nav-links a i {
+            font-size: 1.1rem;
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--pepsi-white);
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .mobile-menu-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Pepsi Hero Section */
+        .order-hero {
+            background: linear-gradient(rgba(0, 75, 147, 0.9), rgba(0, 51, 102, 0.95)), 
+                       url('https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--pepsi-white);
+            padding: 160px 0 80px;
+            text-align: center;
+            margin-top: 73px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .order-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(255, 0, 0, 0.2) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+        }
+        
+        .order-hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
+            animation: fadeInDown 0.8s ease-out;
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
+        
+        .order-hero p {
+            font-size: 1.4rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            opacity: 0.95;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+        
+        /* CLICKABLE Admin Toggle Button */
+        #adminToggleBtn {
+            background: linear-gradient(135deg, var(--pepsi-blue), #003366);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer !important;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(0, 75, 147, 0.3);
+            position: relative;
+            z-index: 10;
+        }
+        
+        #adminToggleBtn:hover {
+            background: linear-gradient(135deg, #003366, var(--pepsi-blue));
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 75, 147, 0.4);
+        }
+        
+        #adminToggleBtn:active {
+            transform: translateY(-1px);
+        }
+        
+        #adminToggleBtn i {
+            font-size: 1.2rem;
+        }
+        
+        /* Admin Controls - Hidden by default */
+        .admin-controls {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff3333 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 0 0 30px 0;
+            display: none; /* Hidden by default */
+            animation: slideInDown 0.5s ease-out;
+            box-shadow: 0 5px 20px rgba(255, 0, 0, 0.3);
+            border: 2px solid white;
+            width: 100%;
+        }
+        
+        .admin-controls.active {
+            display: block; /* Show when active */
+        }
+        
+        .admin-toggle {
+            background: var(--pepsi-blue);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .admin-toggle:hover {
+            background: #003366;
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .price-override-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Order Container */
+        .order-container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            padding: 40px 0;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        /* Product Selection - Pepsi Style */
+        .product-selection {
+            background: var(--pepsi-white);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 75, 147, 0.15);
+            border: 2px solid var(--pepsi-blue);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .product-selection::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--pepsi-blue), var(--pepsi-red));
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            color: var(--pepsi-blue);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--pepsi-red);
+            font-weight: 800;
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--pepsi-blue), transparent);
+        }
+        
+        /* Order Type Toggle - Enhanced */
+        .order-type-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: var(--pepsi-gray);
+            padding: 5px;
+            border-radius: 12px;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .order-type-btn {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid transparent;
+            background: transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            color: var(--pepsi-blue);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .order-type-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: var(--pepsi-blue);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+        
+        .order-type-btn.active {
+            background: var(--pepsi-blue);
+            color: var(--pepsi-white);
+            box-shadow: 0 4px 15px rgba(0, 75, 147, 0.3);
+        }
+        
+        .order-type-btn.active::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .order-type-btn.wholesale.active {
+            background: var(--pepsi-red);
+        }
+        
+        /* Category Tabs */
+        .category-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .category-tab {
+            padding: 12px 25px;
+            border: 2px solid var(--pepsi-blue);
+            background: var(--pepsi-white);
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            color: var(--pepsi-blue);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .category-tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 75, 147, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+        
+        .category-tab:hover::before {
+            left: 100%;
+        }
+        
+        .category-tab.active {
+            background: var(--pepsi-blue);
+            color: var(--pepsi-white);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 75, 147, 0.3);
+        }
+        
+        /* Products List */
+        .products-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .products-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .products-list::-webkit-scrollbar-track {
+            background: var(--pepsi-gray);
+            border-radius: 10px;
+        }
+        
+        .products-list::-webkit-scrollbar-thumb {
+            background: var(--pepsi-blue);
+            border-radius: 10px;
+        }
+        
+        /* Product Item - Enhanced */
+        .product-item {
+            background: var(--pepsi-white);
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .product-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 75, 147, 0.15);
+            border-color: var(--pepsi-blue);
+        }
+        
+        .product-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--pepsi-blue), var(--pepsi-red));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+        
+        .product-item:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .product-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .product-image {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            border-radius: 10px;
+            background: var(--pepsi-gray);
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            transition: transform 0.3s ease;
+        }
+        
+        .product-item:hover .product-image {
+            transform: scale(1.1);
+        }
+        
+        .product-name {
+            font-weight: 700;
+            color: var(--pepsi-blue);
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+        
+        .product-price-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .price-display {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--success);
+        }
+        
+        .price-display.wholesale {
+            color: var(--pepsi-red);
+        }
+        
+        /* Quantity Controls - Enhanced */
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--pepsi-gray);
+            padding: 5px;
+            border-radius: 25px;
+        }
+        
+        .qty-btn {
+            width: 36px;
+            height: 36px;
+            border: 2px solid var(--pepsi-blue);
+            background: var(--pepsi-white);
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            color: var(--pepsi-blue);
+        }
+        
+        .qty-btn:hover {
+            background: var(--pepsi-blue);
+            color: var(--pepsi-white);
+            transform: scale(1.1);
+        }
+        
+        .qty-input {
+            width: 60px;
+            text-align: center;
+            padding: 8px;
+            border: 2px solid var(--pepsi-blue);
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+        
+        .qty-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 75, 147, 0.2);
+        }
+        
+        .add-btn {
+            background: linear-gradient(135deg, var(--pepsi-blue), #003366);
+            color: var(--pepsi-white);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            justify-content: center;
+        }
+        
+        .add-btn:hover {
+            background: linear-gradient(135deg, #003366, var(--pepsi-blue));
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 75, 147, 0.4);
+        }
+        
+        .add-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* Order Summary - Pepsi Style */
+        .order-summary {
+            background: var(--pepsi-white);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 75, 147, 0.15);
+            border: 2px solid var(--pepsi-red);
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+            animation: slideInRight 0.6s ease-out 0.2s both;
+        }
+        
+        .order-summary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--pepsi-red), var(--pepsi-blue));
+        }
+        
+        .order-items {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--pepsi-gray);
+        }
+        
+        .order-items::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .order-items::-webkit-scrollbar-track {
+            background: var(--pepsi-gray);
+            border-radius: 10px;
+        }
+        
+        .order-items::-webkit-scrollbar-thumb {
+            background: var(--pepsi-red);
+            border-radius: 10px;
+        }
+        
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: var(--pepsi-gray);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            animation: fadeIn 0.3s ease-out;
+            border-left: 4px solid var(--pepsi-blue);
+        }
+        
+        .order-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .item-name {
+            flex: 1;
+            font-weight: 600;
+            color: var(--pepsi-blue);
+        }
+        
+        .item-qty {
+            margin: 0 15px;
+            color: var(--pepsi-blue);
+            font-weight: 600;
+        }
+        
+        .item-price {
+            font-weight: 700;
+            color: var(--success);
+            min-width: 100px;
+            text-align: right;
+        }
+        
+        .remove-item {
+            color: var(--danger);
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .remove-item:hover {
+            transform: scale(1.2);
+        }
+        
+        /* Price Breakdown */
+        .price-breakdown {
+            margin: 25px 0;
+        }
+        
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+            animation: fadeInUp 0.3s ease-out;
+        }
+        
+        .price-row:last-child {
+            border-bottom: none;
+        }
+        
+        .price-row.total {
+            border-top: 3px solid var(--pepsi-blue);
+            margin-top: 15px;
+            padding-top: 20px;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--pepsi-blue);
+            animation: pulse 2s infinite;
+        }
+        
+        /* Order Form - Enhanced */
+        .order-form {
+            margin-top: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            animation: fadeInUp 0.3s ease-out;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            color: var(--pepsi-blue);
+        }
+        
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--pepsi-white);
+        }
+        
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--pepsi-blue);
+            box-shadow: 0 0 0 3px rgba(0, 75, 147, 0.2);
+        }
+        
+        .form-textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--pepsi-red), #cc0000);
+            color: var(--pepsi-white);
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #cc0000, var(--pepsi-red));
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 0, 0, 0.3);
+        }
+        
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+        
+        .submit-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Order Information */
+        .order-info {
+            background: linear-gradient(135deg, var(--pepsi-blue), #003366);
+            color: var(--pepsi-white);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 75, 147, 0.2);
+            margin-top: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .order-info::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            animation: rotate 20s linear infinite;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .info-card {
+            text-align: center;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .info-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .info-icon {
+            font-size: 3rem;
+            color: var(--pepsi-white);
+            margin-bottom: 20px;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+        }
+        
+        /* Empty Cart */
+        .empty-cart {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .empty-cart i {
+            font-size: 5rem;
+            color: #e0e0e0;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+        
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, var(--pepsi-blue), #003366);
+            color: var(--pepsi-white);
+            padding: 60px 0 30px;
+            margin-top: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--pepsi-red), var(--pepsi-blue));
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .footer-section h3 {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: var(--pepsi-white);
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+            padding: 5px 0;
+            position: relative;
+        }
+        
+        .footer-links a::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--pepsi-red);
+            transition: width 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--pepsi-white);
+            transform: translateX(5px);
+        }
+        
+        .footer-links a:hover::before {
+            width: 30px;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeInDown {
+            from { 
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideInLeft {
+            from { 
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes slideInRight {
+            from { 
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes slideInDown {
+            from { 
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .order-container {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            
+            .order-summary {
+                position: static;
+                order: 1;
+            }
+            
+            .product-selection {
+                order: 2;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: var(--pepsi-blue);
+                flex-direction: column;
+                padding: 1.5rem;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+                animation: slideInDown 0.3s ease-out;
+            }
+            
+            .nav-links.active {
+                display: flex;
+            }
+            
+            .order-hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .order-hero p {
+                font-size: 1.1rem;
+            }
+            
+            .products-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .product-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+            
+            .add-btn {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .order-type-toggle, .category-tabs {
+                flex-direction: column;
+            }
+            
+            .order-hero h1 {
+                font-size: 2rem;
+            }
+            
+            .section-title {
+                font-size: 1.6rem;
+            }
+            
+            .product-selection, .order-summary, .order-info {
+                padding: 20px;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            #adminToggleBtn {
+                padding: 12px 20px;
+                font-size: 1rem;
+            }
+        }
+        
+        /* Admin Override Modal */
+        .override-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .override-modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--pepsi-white);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            animation: slideInUp 0.3s ease-out;
+            border: 4px solid var(--pepsi-red);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--pepsi-blue);
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--pepsi-red);
+            transition: transform 0.3s ease;
+        }
+        
+        .close-modal:hover {
+            transform: scale(1.2);
+        }
+        
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            z-index: 3000;
+            animation: slideInRight 0.3s ease-out;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .toast.success {
+            background: linear-gradient(135deg, var(--success), #1e7e34);
+            border-left: 4px solid #155724;
+        }
+        
+        .toast.error {
+            background: linear-gradient(135deg, var(--danger), #bd2130);
+            border-left: 4px solid #721c24;
+        }
+        
+        .toast.info {
+            background: linear-gradient(135deg, var(--pepsi-blue), #003366);
+            border-left: 4px solid #001a33;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header & Navigation -->
+    <header class="header">
+        <div class="container">
+            <nav class="nav-container">
+                <div class="logo-container">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Pepsi_2023.svg/640px-Pepsi_2023.svg.png" alt="Arijeem Logo" class="logo">
+                    <span class="company-name">Arijeem Enterprises</span>
+                </div>
+                
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="services.html"><i class="fas fa-concierge-bell"></i> Services</a></li>
+                    <li><a href="products.html"><i class="fas fa-wine-bottle"></i> Products</a></li>
+                    <li><a href="order.html"><i class="fas fa-shopping-cart"></i> Order</a></li>
+                    <li><a href="contact.html"><i class="fas fa-phone"></i> Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Order Hero -->
+    <section class="order-hero">
+        <div class="container">
+            <h1>Place Your Order</h1>
+            <p>Select products, specify quantities, and place your order. Clear identification eliminates confusion.</p>
+            <!-- CLICKABLE Admin Toggle Button -->
+            <button id="adminToggleBtn">
+                <i class="fas fa-key"></i> Admin Price Override
+            </button>
+        </div>
+    </section>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Admin Controls - Hidden by default -->
+        <div class="admin-controls" id="adminControls">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="margin: 0; color: white;">
+                    <i class="fas fa-user-shield"></i> ADMIN PRICE OVERRIDE CONTROLS
+                </h3>
+                <button class="admin-toggle" id="adminExitBtn" style="background: white; color: var(--pepsi-red);">
+                    <i class="fas fa-sign-out-alt"></i> Exit Admin Mode
+                </button>
+            </div>
+            
+            <div class="price-override-controls" id="priceOverrideControls">
+                <!-- Only "Add to Cart" products will appear here dynamically -->
+            </div>
+
+            <!-- Secret Custom Entry Activation -->
+            <div style="margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.1); border-radius: 8px;">
+                <h4 style="margin: 0 0 10px 0; color: white;">
+                    <i class="fas fa-user-secret"></i> Secret Activation
+                </h4>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input id="customCodeInput" type="password" placeholder="Enter secret code (******)" 
+                           style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3);">
+                    <button id="activateCustomBtn" class="admin-toggle" style="background: white; color: var(--pepsi-red);">
+                        <i class="fas fa-check"></i> Activate
+                    </button>
+                    <span id="customStatus" style="color: white; font-weight: 600; padding: 8px 15px; background: rgba(0,0,0,0.3); border-radius: 20px;">
+                        Status: OFF
+                    </span>
+                </div>
+                <small style="color: rgba(255,255,255,0.7); display: block; margin-top: 8px;">
+                    Note: Enter code to activate custom pricing
+                </small>
+            </div>
+        </div>
+        
+        <!-- Order Container -->
+        <div class="order-container">
+            <!-- Product Selection -->
+            <div class="product-selection">
+                <h2 class="section-title">Select Products</h2>
+            
+                <!-- Order Type Toggle -->
+                <div class="order-type-toggle">
+                    <button class="order-type-btn active" id="retailBtn">Retail Order (<50 units)</button>
+                    <button class="order-type-btn" id="wholesaleBtn">Wholesale Order (50+ units)</button>
+                </div>
+                
+                <!-- Category Tabs -->
+                <div class="product-category-selector">
+                    <div class="category-tabs">
+                        <button class="category-tab water active" data-category="water">Bottled Water</button>
+                        <button class="category-tab rgb" data-category="rgb">RGB Glass Bottles</button>
+                        <button class="category-tab pet" data-category="pet">PET Plastic Bottles</button>
+                        <button class="category-tab cans" data-category="cans">Beverage Cans</button>
+                    </div>
+                </div>
+                
+                <!-- Products List -->
+                <div class="products-list" id="productsList">
+                    <!-- Products will be dynamically loaded here -->
+                </div>
+            </div>
+            
+            <!-- Order Summary -->
+            <div class="order-summary">
+                <h2 class="section-title">Order Summary</h2>
+                
+                <div class="order-items" id="orderItems">
+                    <!-- Order items will appear here -->
+                    <div class="empty-cart" id="emptyCart">
+                        <i class="fas fa-shopping-cart"></i>
+                        <p>Your cart is empty</p>
+                        <p>Add products from the list</p>
+                    </div>
+                </div>
+                
+                <!-- Price Breakdown -->
+                <div class="price-breakdown" id="priceBreakdown" style="display: none;">
+                    <div class="price-row">
+                        <span>Subtotal:</span>
+                        <span id="subtotal">₦0</span>
+                    </div>
+                    <div class="price-row">
+                        <span>Delivery Fee:</span>
+                        <span id="deliveryFee">₦0</span>
+                    </div>
+                    <div class="price-row total">
+                        <span>Total:</span>
+                        <span id="totalAmount">₦0</span>
+                    </div>
+                </div>
+                
+                <!-- Order Form -->
+                <form class="order-form" id="orderForm">
+                    <div class="form-group">
+                        <label class="form-label">Order Type:</label>
+                        <div class="order-type-display" id="orderTypeDisplay">Retail Order</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Delivery Method:</label>
+                        <label style="margin-right:12px;"><input type="radio" name="deliveryOption" value="delivery" checked> Delivery (₦100)</label>
+                        <label><input type="radio" name="deliveryOption" value="pickup"> Pickup (Free)</label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="customerName">Full Name *</label>
+                        <input type="text" id="customerName" class="form-input" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="customerPhone">Phone Number *</label>
+                        <input type="tel" id="customerPhone" class="form-input" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="customerEmail">Email Address</label>
+                        <input type="email" id="customerEmail" class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="deliveryAddress">Delivery Address *</label>
+                        <textarea id="deliveryAddress" class="form-textarea" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="deliveryDate">Preferred Delivery Date</label>
+                        <input type="date" id="deliveryDate" class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="orderNotes">Additional Notes</label>
+                        <textarea id="orderNotes" class="form-textarea" placeholder="Special instructions, building landmarks, etc."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn" id="submitOrder">
+                        <i class="fas fa-paper-plane"></i> Submit Order
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Order Information -->
+        <div class="order-info">
+            <h2 class="section-title" style="color: white; border-bottom-color: rgba(255,255,255,0.3);">Ordering Information</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <h3>Fast Delivery</h3>
+                    <p>Same-day delivery available for orders placed before 2pm</p>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <h3>Flexible Payment</h3>
+                    <p>Pay on delivery, bank transfer, or POS available</p>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3>Order Support</h3>
+                    <p>Call +234 803 123 4567 for assistance with your order</p>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <h3>Scheduled Orders</h3>
+                    <p>Set up recurring orders for regular supply needs</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Override Modal -->
+    <div class="override-modal" id="overrideModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="margin: 0; color: var(--pepsi-blue);">
+                    <i class="fas fa-user-shield"></i> Admin Access Required
+                </h2>
+                <button class="close-modal" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="adminCode">Enter Admin Code:</label>
+                <input type="password" id="adminCode" class="form-input" placeholder="Enter 6-digit admin code" maxlength="6">
+                <p style="margin-top: 10px; font-size: 0.9rem; color: #666;">
+                    <i class="fas fa-info-circle"></i> Default admin code: ******
+                </p>
+            </div>
+            <button class="submit-btn" id="verifyAdminBtn" style="margin-top: 20px;">
+                <i class="fas fa-check"></i> Verify Admin Code
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>Arijeem Enterprises</h3>
+                    <p>Easy ordering system. Clear product identification. Fast delivery to your location.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="teams.html"></i>Meet our Team</a></li>
+                    <li><a href="promo-loyalty.html"></i>Explore our Loyalty</a></li>
+                        <li><a href="order.html">Place Order</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-phone"></i> +234 803 123 4567</li>
+                        <li><i class="fas fa-phone"></i> +234 902 876 5432</li>
+                        <li><i class="fas fa-envelope"></i> orders@arijeementerprises.com</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Lagos, Nigeria</li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Order Support</h3>
+                    <ul class="footer-links">
+                        <li>Order Inquiries: 8am - 8pm</li>
+                        <li>Emergency Orders: 24/7</li>
+                        <li>Delivery Tracking: SMS Updates</li>
+                        <li>Returns & Refunds: Within 24hrs</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2024 Arijeem Multipurpose Enterprises. All rights reserved. | Structured ordering eliminates errors</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // COMPLETE Product Data with ALL products restored
+        const products = {
+            water: [
+                { 
+                    id: 1, 
+                    name: "Nirvana Water", 
+                    type: "PET", 
+                    retailPrice: 1400, 
+                    wholesalePrice: 1300, 
+                    minWholesale: 50,
+                    image: "Nirvana.png",
+                    description: "Premium drinking water in PET bottle"
+                },
+                { 
+                    id: 2, 
+                    name: "Eva Water 1.5L", 
+                    type: "PET", 
+                    retailPrice: 3600, 
+                    wholesalePrice: 3600, 
+                    minWholesale: 50,
+                    image: "eva.png",
+                    description: "Large 1.5L PET bottle for families"
+                },
+                { 
+                    id: 3, 
+                    name: "Aquafina 50cl", 
+                    type: "PET", 
+                    retailPrice: 1700, 
+                    wholesalePrice: 1650, 
+                    minWholesale: 50,
+                    image: "aquafina.png",
+                    description: "Premium purified water in 50cl PET bottle"
+                },
+                { 
+                    id: 4, 
+                    name: "Aquafina 75cl", 
+                    type: "PET", 
+                    retailPrice: 2200, 
+                    wholesalePrice: 2150, 
+                    minWholesale: 50,
+                    image: "aquafina.png",
+                    description: "Premium purified water in 75cl PET bottle"
+                }
+            ],
+            rgb: [
+                { 
+                    id: 5, 
+                    name: "Pepsi Glass Bottle", 
+                    type: "RGB", 
+                    retailPrice: 4500, 
+                    wholesalePrice: 4400, 
+                    minWholesale: 50,
+                    image: "pep.png",
+                    description: "Classic Pepsi cola in returnable glass bottle"
+                },
+                { 
+                    id: 6, 
+                    name: "7UP Glass Bottle", 
+                    type: "RGB", 
+                    retailPrice: 3000, 
+                    wholesalePrice: 2950, 
+                    minWholesale: 50,
+                    image: "7up-glass.png",
+                    description: "Refreshing lemon-lime soda in returnable glass bottle"
+                },
+                { 
+                    id: 7, 
+                    name: "SK Glass Bottle", 
+                    type: "RGB", 
+                    retailPrice: 3120, 
+                    wholesalePrice: 3050, 
+                    minWholesale: 50,
+                    image: "komma.png",
+                    description: "Premium soda in returnable glass bottle"
+                },
+                { 
+                    id: 8, 
+                    name: "Big Coke RGB 50cl", 
+                    type: "RGB", 
+                    retailPrice: 6000, 
+                    wholesalePrice: 6000, 
+                    minWholesale: 50,
+                    image: "bigcokergb.png",
+                    description: "Large 50cl Coca-Cola in returnable glass bottle"
+                },
+                {
+                    id: 14,
+                    name: "Small Red Cover Coke (RGB)",
+                    type: "RGB",
+                    retailPrice: 3200,
+                    wholesalePrice: 3200,
+                    minWholesale: 50,
+                    image: "coke.png",
+                    description: "Small Coca‑Cola in red-covered RGB glass bottle"
+                },
+                {
+                    id: 15,
+                    name: "Small Zero Coke (RGB)",
+                    type: "RGB",
+                    retailPrice: 3200,
+                    wholesalePrice: 3200,
+                    minWholesale: 50,
+                    image: "zerorgb-coke.png",
+                    description: "Small Coca‑Cola Zero in RGB glass bottle"
+                },
+                {
+                    id: 16,
+                    name: "Mirinda (RGB)",
+                    type: "RGB",
+                    retailPrice: 4200,
+                    wholesalePrice: 4150,
+                    minWholesale: 50,
+                    image: "mirin.png",
+                    description: "Mirinda in returnable glass bottle"
+                }
+            ],
+            pet: [
+                { 
+                    id: 9, 
+                    name: "Coke and Fanta PET", 
+                    type: "PET", 
+                    retailPrice: 4400, 
+                    wholesalePrice: 4400, 
+                    minWholesale: 50,
+                    image: "pepsi.png",
+                    description: "Classic Coca-Cola and Fanta in plastic PET bottles"
+                },
+                { 
+                    id: 10, 
+                    name: "Razzle 40cl PET", 
+                    type: "PET", 
+                    retailPrice: 2200, 
+                    wholesalePrice: 2100, 
+                    minWholesale: 50,
+                    image: "razzle.png",
+                    description: "Fruity Razzle soda in 40cl plastic bottle"
+                },
+                { 
+                    id: 11, 
+                    name: "PET 60CL (Mirinda, Pepsi, Fanta)", 
+                    type: "PET", 
+                    retailPrice: 4250, 
+                    wholesalePrice: 4150, 
+                    minWholesale: 50,
+                    image: "mirinda.png",
+                    description: "Mirinda, Pepsi, or Fanta in 60cl plastic bottle"
+                },
+                { 
+                    id: 12, 
+                    name: "PET 40CL (Mirinda, Pepsi, Fanta)", 
+                    type: "PET", 
+                    retailPrice: 2320, 
+                    wholesalePrice: 2300, 
+                    minWholesale: 50,
+                    image: "mirinda.png",
+                    description: "Mirinda, Pepsi, or Fanta in 40cl plastic bottle"
+                },
+                {
+                    id: 17,
+                    name: "7UP (PET)",
+                    type: "PET",
+                    retailPrice: 3000,
+                    wholesalePrice: 2950,
+                    minWholesale: 50,
+                    image: "7up.png",
+                    description: "7UP in PET plastic bottle"
+                },
+                {
+                    id: 18,
+                    name: "Lacasera (PET)",
+                    type: "PET",
+                    retailPrice: 2300,
+                    wholesalePrice: 2200,
+                    minWholesale: 50,
+                    image: "lacasera.png",
+                    description: "Lacasera in PET bottle"
+                },
+                {
+                    id: 19,
+                    name: "America Cola (PET)",
+                    type: "PET",
+                    retailPrice: 3700,
+                    wholesalePrice: 3600,
+                    minWholesale: 50,
+                    image: "america-cola.png",
+                    description: "America Cola in PET bottle"
+                },
+                {
+                    id: 20,
+                    name: "Kommando 30cl (PET)",
+                    type: "PET",
+                    retailPrice: 3050,
+                    wholesalePrice: 3000,
+                    minWholesale: 50,
+                    image: "kommando.png",
+                    description: "Kommando soda in 30cl PET bottle"
+                },
+                {
+                    id: 21,
+                    name: "Kommando 50cl (PET)",
+                    type: "PET",
+                    retailPrice: 3120,
+                    wholesalePrice: 3050,
+                    minWholesale: 50,
+                    image: "kommando.png",
+                    description: "Kommando soda in 50cl PET bottle"
+                }
+            ],
+            cans: [
+                { 
+                    id: 13, 
+                    name: "Dubic Can", 
+                    type: "Cans", 
+                    retailPrice: 12000, 
+                    wholesalePrice: 11000, 
+                    minWholesale: 30,
+                    image: "dubic-malt.png",
+                    description: "Premium beverage in convenient aluminum can packaging"
+                }
+            ]
+        };
+
+        // Global state variables
+        let priceOverrides = JSON.parse(localStorage.getItem('priceOverrides')) || {};
+        let isAdminMode = false; // Start with admin mode OFF
+        let isWholesaleMode = false;
+        let currentCategory = 'water';
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let customEntryActivated = false; // Start with custom entry OFF
+
+        // DOM Elements
+        const adminControls = document.getElementById('adminControls');
+        const adminToggleBtn = document.getElementById('adminToggleBtn');
+        const overrideModal = document.getElementById('overrideModal');
+        const closeModal = document.getElementById('closeModal');
+        const verifyAdminBtn = document.getElementById('verifyAdminBtn');
+        const adminCodeInput = document.getElementById('adminCode');
+        const adminExitBtn = document.getElementById('adminExitBtn');
+        const priceOverrideControls = document.getElementById('priceOverrideControls');
+        const activateCustomBtn = document.getElementById('activateCustomBtn');
+        const customCodeInput = document.getElementById('customCodeInput');
+        const customStatus = document.getElementById('customStatus');
+        const retailBtn = document.getElementById('retailBtn');
+        const wholesaleBtn = document.getElementById('wholesaleBtn');
+        const categoryTabs = document.querySelectorAll('.category-tab');
+        const productsList = document.getElementById('productsList');
+        const orderItems = document.getElementById('orderItems');
+        const emptyCart = document.getElementById('emptyCart');
+        const priceBreakdown = document.getElementById('priceBreakdown');
+        const orderTypeDisplay = document.getElementById('orderTypeDisplay');
+        const orderForm = document.getElementById('orderForm');
+        const submitOrderBtn = document.getElementById('submitOrder');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const navLinks = document.getElementById('navLinks');
+
+        // Initialize - Admin controls start HIDDEN
+        updateCustomStatus();
+
+        // Helper Functions
+        function showAdminControls(show) {
+            if (show) {
+                adminControls.classList.add('active');
+                console.log("✅ Admin controls SHOWN");
+                loadPriceOverrideControls(); // Load only "Add to Cart" products
+            } else {
+                adminControls.classList.remove('active');
+                console.log("❌ Admin controls HIDDEN");
+            }
+        }
+
+        function updateCustomStatus() {
+            if (customStatus) {
+                customStatus.textContent = customEntryActivated ? 'Status: ON (1***8*)' : 'Status: OFF';
+                customStatus.style.color = customEntryActivated ? '#ffcc00' : 'white';
+                customStatus.style.background = customEntryActivated ? 'rgba(255,204,0,0.2)' : 'rgba(0,0,0,0.3)';
+            }
+        }
+
+        // Load ONLY products that have been added to cart for override
+        function loadPriceOverrideControls() {
+            priceOverrideControls.innerHTML = '';
+            
+            if (cart.length === 0) {
+                priceOverrideControls.innerHTML = `
+                    <div style="color: white; text-align: center; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                        <i class="fas fa-shopping-cart" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>No products in cart</p>
+                        <p>Add products to cart to see override controls</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            cart.forEach(cartItem => {
+                const product = findProduct(cartItem.id);
+                if (product) {
+                    const overrideDiv = document.createElement('div');
+                    overrideDiv.style.cssText = `
+                        background: rgba(255,255,255,0.1);
+                        padding: 15px;
+                        border-radius: 8px;
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        flex-wrap: wrap;
+                    `;
+                    
+                    overrideDiv.innerHTML = `
+                        <div style="flex: 1; min-width: 200px;">
+                            <div style="font-weight: 600; color: white;">${product.name}</div>
+                            <div style="font-size: 0.9rem; color: rgba(255,255,255,0.8);">
+                                In cart: ${cartItem.quantity} units
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 5px; align-items: center;">
+                            <input type="number" 
+                                   id="override-${product.id}" 
+                                   value="${priceOverrides[product.id] || ''}" 
+                                   placeholder="Custom price" 
+                                   style="width: 120px; padding: 8px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.9);">
+                            <button onclick="saveOverride(${product.id})" style="padding: 8px 15px; border-radius: 5px; border: none; background: white; color: var(--pepsi-red); cursor: pointer; font-weight: 600;">
+                                Save
+                            </button>
+                            <button onclick="clearOverride(${product.id})" style="padding: 8px 15px; border-radius: 5px; border: none; background: #666; color: white; cursor: pointer; font-weight: 600;">
+                                Clear
+                            </button>
+                        </div>
+                    `;
+                    priceOverrideControls.appendChild(overrideDiv);
+                }
+            });
+        }
+
+        window.saveOverride = function(productId) {
+            if (!customEntryActivated) {
+                showToast('Please activate custom entry first!', 'error');
+                return;
+            }
+            
+            const input = document.getElementById(`override-${productId}`);
+            const value = parseInt(input.value);
+            
+            if (value && value > 0) {
+                priceOverrides[productId] = value;
+                localStorage.setItem('priceOverrides', JSON.stringify(priceOverrides));
+                showToast('Price override saved for cart item!', 'success');
+                loadProducts();
+                updateCart();
+                loadPriceOverrideControls(); // Refresh override controls
+            } else {
+                showToast('Please enter a valid price', 'error');
+            }
+        }
+
+        window.clearOverride = function(productId) {
+            if (!customEntryActivated) {
+                showToast('Please activate custom entry first!', 'error');
+                return;
+            }
+            
+            delete priceOverrides[productId];
+            localStorage.setItem('priceOverrides', JSON.stringify(priceOverrides));
+            const input = document.getElementById(`override-${productId}`);
+            if (input) input.value = '';
+            showToast('Price override cleared!', 'info');
+            loadProducts();
+            updateCart();
+            loadPriceOverrideControls(); // Refresh override controls
+        }
+
+        function findProduct(productId) {
+            for (const category in products) {
+                const product = products[category].find(p => p.id === productId);
+                if (product) return product;
+            }
+            return null;
+        }
+
+        function calculatePrice(product, quantity) {
+            if (priceOverrides[product.id]) {
+                return priceOverrides[product.id];
+            }
+            
+            if (isWholesaleMode || quantity >= product.minWholesale) {
+                return product.wholesalePrice;
+            }
+            return product.retailPrice;
+        }
+
+        function getTypeColor(type) {
+            switch(type.toLowerCase()) {
+                case 'water': return 'var(--pepsi-light-blue)';
+                case 'rgb': return '#32CD32';
+                case 'pet': return '#FF4500';
+                case 'cans': return '#FFD700';
+                default: return '#666';
+            }
+        }
+
+        function saveCart() {
+            localStorage.setItem('cart', JSON.stringify(cart));
+            // Refresh override controls when cart changes
+            if (isAdminMode) {
+                loadPriceOverrideControls();
+            }
+        }
+
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideInRight 0.3s ease-out reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // CLICKABLE Admin Toggle Button
+        adminToggleBtn.addEventListener('click', function(event) {
+            console.log("✅ Admin toggle button CLICKED!");
+            overrideModal.classList.add('active');
+        });
+
+        closeModal.addEventListener('click', function() {
+            overrideModal.classList.remove('active');
+            adminCodeInput.value = '';
+        });
+
+        verifyAdminBtn.addEventListener('click', function() {
+            const adminCode = adminCodeInput.value;
+            if (adminCode === '123456') {
+                isAdminMode = true;
+                overrideModal.classList.remove('active');
+                adminCodeInput.value = '';
+                showAdminControls(true);
+                showToast('✅ Admin mode activated successfully!', 'success');
+            } else {
+                showToast('❌ Invalid admin code!', 'error');
+            }
+        });
+
+        adminExitBtn.addEventListener('click', function() {
+            isAdminMode = false;
+            showAdminControls(false);
+            showToast('Admin mode deactivated', 'info');
+        });
+
+        // Secret Custom Entry Activation (Code: 123789)
+        activateCustomBtn.addEventListener('click', function() {
+            const code = (customCodeInput.value || '').trim();
+            if (code === '123789') {
+                customEntryActivated = true;
+                updateCustomStatus();
+                showToast('✅ Custom entry activated! You can now override prices.', 'success');
+                customCodeInput.value = '';
+            } else {
+                showToast('❌ Invalid activation code', 'error');
+            }
+        });
+
+        // Mobile Menu
+        mobileMenuBtn.addEventListener('click', function() {
+            navLinks.classList.toggle('active');
+        });
+
+        document.addEventListener('click', function(event) {
+            if (!navLinks.contains(event.target) && !mobileMenuBtn.contains(event.target)) {
+                navLinks.classList.remove('active');
+            }
+        });
+
+        // Order Type Toggle
+        retailBtn.addEventListener('click', () => {
+            isWholesaleMode = false;
+            retailBtn.classList.add('active');
+            wholesaleBtn.classList.remove('active');
+            orderTypeDisplay.textContent = 'Retail Order (<50 units)';
+            loadProducts();
+            updateCartPrices();
+        });
+
+        wholesaleBtn.addEventListener('click', () => {
+            isWholesaleMode = true;
+            wholesaleBtn.classList.add('active');
+            retailBtn.classList.remove('active');
+            orderTypeDisplay.textContent = 'Wholesale Order (50+ units)';
+            loadProducts();
+            updateCartPrices();
+        });
+
+        // Category Tabs
+        categoryTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                categoryTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentCategory = tab.getAttribute('data-category');
+                loadProducts();
+            });
+        });
+
+        // Load Products with ALL original products
+        function loadProducts() {
+            productsList.innerHTML = '';
+            const categoryProducts = products[currentCategory];
+            
+            categoryProducts.forEach(product => {
+                const productItem = document.createElement('div');
+                productItem.className = 'product-item';
+                productItem.dataset.id = product.id;
+                
+                const overridePrice = priceOverrides[product.id];
+                const currentPrice = overridePrice || (isWholesaleMode ? product.wholesalePrice : product.retailPrice);
+                const priceColor = overridePrice ? 'var(--warning)' : (isWholesaleMode ? 'var(--pepsi-red)' : 'var(--success)');
+                
+                productItem.innerHTML = `
+                    <div class="product-info">
+                        <img src="${product.image}" alt="${product.name}" class="product-image">
+                        <div style="flex: 1;">
+                            <div class="product-name">${product.name}</div>
+                            <div style="font-size: 0.9rem; color: #666; margin-top: 5px;">
+                                ${product.description}
+                            </div>
+                            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                <span class="product-type-badge" style="background: ${getTypeColor(product.type)}; color: white; padding: 3px 10px; border-radius: 12px; font-size: 0.8rem;">
+                                    ${product.type}
+                                </span>
+                                ${overridePrice ? '<span style="background: var(--warning); color: black; padding: 3px 10px; border-radius: 12px; font-size: 0.8rem;">Custom Price</span>' : ''}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="product-price-info">
+                        <div>
+                            <div style="font-size: 1.3rem; font-weight: 800; color: ${priceColor};">
+                                ₦${currentPrice.toLocaleString()}
+                            </div>
+                            <div style="font-size: 0.85rem; color: #666; margin-top: 5px;">
+                                ${isWholesaleMode ? `Wholesale: ${product.minWholesale}+ units` : 'Retail: 1-49 units'}
+                                ${overridePrice ? '<br><small style="color: var(--warning);">Custom price active</small>' : ''}
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <div class="quantity-control">
+                                <button class="qty-btn minus" onclick="updateQuantity(${product.id}, -1)">-</button>
+                                <input type="number" class="qty-input" id="qty-${product.id}" value="${isWholesaleMode ? product.minWholesale : 1}" min="${isWholesaleMode ? product.minWholesale : 1}" max="999" onchange="validateQuantity(${product.id})">
+                                <button class="qty-btn plus" onclick="updateQuantity(${product.id}, 1)">+</button>
+                            </div>
+                            <button class="add-btn" onclick="addToCart(${product.id})">
+                                <i class="fas fa-cart-plus"></i> Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                productsList.appendChild(productItem);
+            });
+        }
+
+        // Quantity Functions
+        window.updateQuantity = function(productId, change) {
+            const input = document.getElementById(`qty-${productId}`);
+            let value = parseInt(input.value) || 0;
+            const product = findProduct(productId);
+            const min = isWholesaleMode ? product.minWholesale : 1;
+            
+            value += change;
+            if (value < min) value = min;
+            if (value > 999) value = 999;
+            
+            input.value = value;
+        }
+
+        window.validateQuantity = function(productId) {
+            const input = document.getElementById(`qty-${productId}`);
+            let value = parseInt(input.value) || 0;
+            const product = findProduct(productId);
+            const min = isWholesaleMode ? product.minWholesale : 1;
+            
+            if (value < min) value = min;
+            if (value > 999) value = 999;
+            
+            input.value = value;
+        }
+
+        // Cart Functions
+        window.addToCart = function(productId) {
+            const product = findProduct(productId);
+            if (!product) return;
+            
+            const qtyInput = document.getElementById(`qty-${productId}`);
+            const quantity = parseInt(qtyInput.value) || (isWholesaleMode ? product.minWholesale : 1);
+            const unitPrice = calculatePrice(product, quantity);
+            
+            const existingItemIndex = cart.findIndex(item => item.id === productId);
+            
+            if (existingItemIndex > -1) {
+                cart[existingItemIndex].quantity += quantity;
+                cart[existingItemIndex].unitPrice = calculatePrice(product, cart[existingItemIndex].quantity);
+            } else {
+                cart.push({
+                    id: productId,
+                    name: product.name,
+                    type: product.type,
+                    unitPrice: unitPrice,
+                    quantity: quantity,
+                    minWholesale: product.minWholesale
+                });
+            }
+            
+            saveCart();
+            updateCart();
+            showToast(`${product.name} added to cart!`, 'success');
+            
+            qtyInput.value = isWholesaleMode ? product.minWholesale : 1;
+            
+            // Refresh override controls if admin mode is active
+            if (isAdminMode) {
+                loadPriceOverrideControls();
+            }
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            saveCart();
+            updateCart();
+            showToast('Item removed from cart', 'error');
+            
+            // Refresh override controls if admin mode is active
+            if (isAdminMode) {
+                loadPriceOverrideControls();
+            }
+        }
+
+        function updateCartPrices() {
+            cart.forEach(item => {
+                const product = findProduct(item.id);
+                if (product) {
+                    item.unitPrice = calculatePrice(product, item.quantity);
+                }
+            });
+            saveCart();
+            updateCart();
+        }
+
+        window.updateCartQuantity = function(productId, change) {
+            const itemIndex = cart.findIndex(item => item.id === productId);
+            if (itemIndex === -1) return;
+            
+            const product = findProduct(productId);
+            const min = isWholesaleMode ? product.minWholesale : 1;
+            
+            cart[itemIndex].quantity += change;
+            if (cart[itemIndex].quantity < min) cart[itemIndex].quantity = min;
+            if (cart[itemIndex].quantity > 999) cart[itemIndex].quantity = 999;
+            
+            cart[itemIndex].unitPrice = calculatePrice(product, cart[itemIndex].quantity);
+            
+            saveCart();
+            updateCart();
+            
+            // Refresh override controls if admin mode is active
+            if (isAdminMode) {
+                loadPriceOverrideControls();
+            }
+        }
+
+        function updateCart() {
+            if (cart.length > 0) {
+                emptyCart.style.display = 'none';
+                priceBreakdown.style.display = 'block';
+            } else {
+                emptyCart.style.display = 'block';
+                priceBreakdown.style.display = 'none';
+                submitOrderBtn.disabled = true;
+                return;
+            }
+            
+            orderItems.innerHTML = '';
+            let subtotal = 0;
+            
+            cart.forEach(item => {
+                const product = findProduct(item.id);
+                const itemTotal = item.unitPrice * item.quantity;
+                subtotal += itemTotal;
+                
+                const orderItem = document.createElement('div');
+                orderItem.className = 'order-item';
+                
+                const priceColor = priceOverrides[item.id] ? 'var(--warning)' : 
+                                 (item.quantity >= item.minWholesale ? 'var(--pepsi-red)' : 'var(--success)');
+                
+                orderItem.innerHTML = `
+                    <div class="item-name">
+                        ${item.name}
+                        ${priceOverrides[item.id] ? '<br><small style="color: var(--warning);">Custom Price</small>' : ''}
+                    </div>
+                    <div class="item-qty">
+                        <button onclick="updateCartQuantity(${item.id}, -1)" style="background: none; border: none; color: var(--pepsi-blue); cursor: pointer; font-size: 1.2rem;">-</button>
+                        <span style="margin: 0 10px; font-weight: 600;">${item.quantity}</span>
+                        <button onclick="updateCartQuantity(${item.id}, 1)" style="background: none; border: none; color: var(--pepsi-blue); cursor: pointer; font-size: 1.2rem;">+</button>
+                    </div>
+                    <div class="item-price" style="color: ${priceColor};">
+                        ₦${itemTotal.toLocaleString()}
+                        <br><small style="font-size: 0.8rem; color: #666;">@ ₦${item.unitPrice.toLocaleString()}</small>
+                    </div>
+                    <button class="remove-item" onclick="removeFromCart(${item.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
+                
+                orderItems.appendChild(orderItem);
+            });
+            
+            const selectedDelivery = document.querySelector('input[name="deliveryOption"]:checked')?.value || 'delivery';
+            const deliveryFee = selectedDelivery === 'pickup' ? 0 : 100;
+            const total = subtotal + deliveryFee;
+            
+            document.getElementById('subtotal').textContent = `₦${subtotal.toLocaleString()}`;
+            document.getElementById('deliveryFee').textContent = deliveryFee === 0 ? 'FREE' : `₦${deliveryFee.toLocaleString()}`;
+            document.getElementById('totalAmount').textContent = `₦${total.toLocaleString()}`;
+            
+            const deliveryFeeEl = document.getElementById('deliveryFee');
+            deliveryFeeEl.style.color = deliveryFee === 0 ? 'var(--success)' : 'inherit';
+            
+            submitOrderBtn.disabled = false;
+        }
+
+        // Submit Order
+        orderForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (cart.length === 0) {
+                showToast('Please add products to your cart before submitting', 'error');
+                return;
+            }
+            
+            const formData = {
+                customerName: document.getElementById('customerName').value,
+                customerPhone: document.getElementById('customerPhone').value,
+                customerEmail: document.getElementById('customerEmail').value,
+                deliveryAddress: document.getElementById('deliveryAddress').value,
+                deliveryDate: document.getElementById('deliveryDate').value,
+                orderNotes: document.getElementById('orderNotes').value,
+                orderType: isWholesaleMode ? 'wholesale' : 'retail',
+                cart: cart,
+                subtotal: document.getElementById('subtotal').textContent,
+                total: document.getElementById('totalAmount').textContent,
+                timestamp: new Date().toISOString()
+            };
+            
+            let orderSummary = `ORDER CONFIRMATION\n`;
+            orderSummary += `================\n`;
+            orderSummary += `Customer: ${formData.customerName}\n`;
+            orderSummary += `Phone: ${formData.customerPhone}\n`;
+            orderSummary += `Delivery Address: ${formData.deliveryAddress}\n`;
+            orderSummary += `Order Type: ${formData.orderType.toUpperCase()}\n`;
+            orderSummary += `Date: ${new Date(formData.deliveryDate).toLocaleDateString()}\n\n`;
+            orderSummary += `ITEMS:\n`;
+            
+            cart.forEach(item => {
+                const product = findProduct(item.id);
+                const priceType = priceOverrides[item.id] ? 'Custom' : 
+                                 (item.quantity >= item.minWholesale ? 'Wholesale' : 'Retail');
+                orderSummary += `- ${item.name}: ${item.quantity} × ₦${item.unitPrice} (${priceType}) = ₦${item.unitPrice * item.quantity}\n`;
+            });
+            
+            orderSummary += `\nSubtotal: ${formData.subtotal}\n`;
+            orderSummary += `Delivery: ${document.getElementById('deliveryFee').textContent}\n`;
+            orderSummary += `TOTAL: ${formData.total}\n\n`;
+            orderSummary += `NOTES: ${formData.orderNotes || 'None'}\n\n`;
+            orderSummary += `Thank you for your order! We'll contact you shortly to confirm delivery.`;
+            
+            alert(orderSummary);
+            
+            orderForm.reset();
+            cart = [];
+            saveCart();
+            updateCart();
+            
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('deliveryDate').valueAsDate = tomorrow;
+            
+            showToast('Order submitted successfully! We will contact you shortly.', 'success');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Initialize
+        function init() {
+            loadProducts();
+            updateCart();
+            
+            document.querySelectorAll('input[name="deliveryOption"]').forEach(r => {
+                r.addEventListener('change', updateCart);
+            });
+            
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('deliveryDate').min = tomorrow.toISOString().split('T')[0];
+            document.getElementById('deliveryDate').valueAsDate = tomorrow;
+            
+            // Add active class to current page link
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                const linkPage = link.getAttribute('href');
+                if (linkPage === currentPage) {
+                    link.style.background = 'rgba(255,255,255,0.2)';
+                    link.style.fontWeight = '600';
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

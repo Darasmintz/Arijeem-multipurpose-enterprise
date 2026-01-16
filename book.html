@@ -1,0 +1,1959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Bulk Orders - Arijeem Enterprises</title>
+    <link rel="icon" type="image/x-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Pepsi_2023.svg/640px-Pepsi_2023.svg.png">
+    <style>
+        :root {
+            --pepsi-blue: #004B93;
+            --pepsi-red: #FF0000;
+            --pepsi-white: #FFFFFF;
+            --pepsi-black: #000000;
+            --pepsi-light-blue: #1E90FF;
+            --pepsi-gray: #F8F9FA;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --accent-gold: #FFD700;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            line-height: 1.6;
+            color: var(--pepsi-black);
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+        }
+        
+        /* Pepsi Header */
+        .header {
+            background: linear-gradient(90deg, var(--pepsi-blue) 0%, #003366 100%);
+            color: var(--pepsi-white);
+            padding: 0.8rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border-bottom: 4px solid var(--pepsi-red);
+            animation: slideDown 0.5s ease-out;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: slideInLeft 0.5s ease-out;
+        }
+        
+        .logo {
+            height: 50px;
+            width: 50px;
+            background: var(--pepsi-white);
+            border-radius: 50%;
+            padding: 5px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .logo:hover {
+            transform: rotate(360deg);
+        }
+        
+        .company-name {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--pepsi-white);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 1px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            color: var(--pepsi-white);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.6rem 1.2rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .nav-links a:hover::before {
+            left: 100%;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--pepsi-white);
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .mobile-menu-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Admin Controls */
+        .admin-controls {
+            background: linear-gradient(135deg, var(--pepsi-red) 0%, #cc0000 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 800px;
+            display: none;
+            animation: slideInDown 0.5s ease-out;
+            box-shadow: 0 5px 20px rgba(255, 0, 0, 0.3);
+        }
+        
+        .admin-controls.active {
+            display: block;
+        }
+        
+        .admin-toggle {
+            background: var(--pepsi-blue);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .admin-toggle:hover {
+            background: #003366;
+            transform: scale(1.05);
+        }
+        
+        /* Booking Hero */
+        .booking-hero {
+            background: linear-gradient(rgba(0, 75, 147, 0.9), rgba(0, 51, 102, 0.95)), 
+                       url('https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--pepsi-white);
+            padding: 160px 0 80px;
+            text-align: center;
+            margin-top: 73px;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        .booking-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(255, 0, 0, 0.2) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+        }
+        
+        .booking-hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
+            animation: fadeInDown 0.8s ease-out;
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
+        
+        .booking-hero p {
+            font-size: 1.4rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            opacity: 0.95;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+        
+        /* Booking Container */
+        .booking-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            padding: 40px 0;
+            animation: fadeIn 0.8s ease-out 0.3s both;
+        }
+        
+        /* Booking Form */
+        .booking-form-section {
+            background: var(--pepsi-white);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 75, 147, 0.15);
+            border: 2px solid var(--pepsi-blue);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .booking-form-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--pepsi-blue), var(--pepsi-red));
+        }
+        
+        .section-title {
+            font-size: 2.2rem;
+            color: var(--pepsi-blue);
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--pepsi-red);
+            font-weight: 800;
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--pepsi-blue), transparent);
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            animation: fadeInUp 0.3s ease-out;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 700;
+            color: var(--pepsi-blue);
+        }
+        
+        .form-label.required::after {
+            content: " *";
+            color: var(--pepsi-red);
+        }
+        
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--pepsi-white);
+        }
+        
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--pepsi-blue);
+            box-shadow: 0 0 0 3px rgba(0, 75, 147, 0.2);
+        }
+        
+        .form-textarea {
+            height: 120px;
+            resize: vertical;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        /* Product Selection */
+        .product-selection {
+            margin: 30px 0;
+            padding: 25px;
+            background: var(--pepsi-gray);
+            border-radius: 15px;
+            border: 2px solid var(--pepsi-blue);
+            animation: slideInUp 0.5s ease-out;
+        }
+        
+        .product-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            background: var(--pepsi-white);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .product-item:hover {
+            transform: translateX(5px);
+            border-color: var(--pepsi-blue);
+            box-shadow: 0 5px 15px rgba(0, 75, 147, 0.1);
+        }
+        
+        .product-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(to bottom, var(--pepsi-blue), var(--pepsi-red));
+            transform: scaleY(0);
+            transform-origin: top;
+            transition: transform 0.3s ease;
+        }
+        
+        .product-item:hover::before {
+            transform: scaleY(1);
+        }
+        
+        /* Quantity Controls */
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .qty-btn {
+            width: 36px;
+            height: 36px;
+            border: 2px solid var(--pepsi-blue);
+            background: var(--pepsi-white);
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            color: var(--pepsi-blue);
+        }
+        
+        .qty-btn:hover {
+            background: var(--pepsi-blue);
+            color: var(--pepsi-white);
+            transform: scale(1.1);
+        }
+        
+        .qty-input {
+            width: 80px;
+            text-align: center;
+            padding: 10px;
+            border: 2px solid var(--pepsi-blue);
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+        
+        .qty-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 75, 147, 0.2);
+        }
+        
+        .price-display {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--success);
+            min-width: 120px;
+            text-align: right;
+        }
+        
+        .price-display.wholesale {
+            color: var(--pepsi-red);
+        }
+        
+        .price-display.custom {
+            color: var(--warning);
+        }
+        
+        /* Booking Info */
+        .booking-info {
+            background: var(--pepsi-white);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 75, 147, 0.15);
+            border: 2px solid var(--pepsi-red);
+            height: fit-content;
+            animation: slideInRight 0.6s ease-out 0.2s both;
+        }
+        
+        .booking-info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--pepsi-red), var(--pepsi-blue));
+        }
+        
+        .info-card {
+            background: linear-gradient(135deg, var(--pepsi-gray) 0%, #e9ecef 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border-left: 4px solid var(--pepsi-blue);
+            transition: all 0.3s ease;
+        }
+        
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .info-card h3 {
+            color: var(--pepsi-blue);
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        
+        .info-list {
+            list-style: none;
+        }
+        
+        .info-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: transform 0.3s ease;
+        }
+        
+        .info-list li:hover {
+            transform: translateX(5px);
+        }
+        
+        .info-list li i {
+            color: var(--success);
+            font-size: 1.1rem;
+        }
+        
+        /* Pricing Calculator */
+        .pricing-calculator {
+            background: linear-gradient(135deg, var(--pepsi-blue) 0%, #003366 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 30px;
+            animation: pulse 2s infinite;
+        }
+        
+        .calculator-title {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: white;
+            font-weight: 700;
+        }
+        
+        .calculator-result {
+            text-align: center;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            margin-top: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .estimated-total {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--accent-gold);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            animation: bounce 2s infinite;
+        }
+        
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--pepsi-red), #cc0000);
+            color: var(--pepsi-white);
+            border: none;
+            border-radius: 12px;
+            font-size: 1.3rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+        
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+        
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #cc0000, var(--pepsi-red));
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 0, 0, 0.3);
+        }
+        
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* Booking Process */
+        .booking-process {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .booking-process::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--pepsi-blue), var(--pepsi-red));
+        }
+        
+        .process-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .step-card {
+            background: var(--pepsi-white);
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 75, 147, 0.1);
+            position: relative;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .step-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--pepsi-blue);
+            box-shadow: 0 20px 40px rgba(0, 75, 147, 0.15);
+        }
+        
+        .step-number {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--pepsi-blue), var(--pepsi-red));
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .step-icon {
+            font-size: 3.5rem;
+            color: var(--pepsi-blue);
+            margin: 20px 0;
+            transition: transform 0.3s ease;
+        }
+        
+        .step-card:hover .step-icon {
+            transform: scale(1.2);
+        }
+        
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, var(--pepsi-blue), #003366);
+            color: var(--pepsi-white);
+            padding: 60px 0 30px;
+            margin-top: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--pepsi-red), var(--pepsi-blue));
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .footer-section h3 {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: var(--pepsi-white);
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+            padding: 5px 0;
+            position: relative;
+        }
+        
+        .footer-links a::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--pepsi-red);
+            transition: width 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--pepsi-white);
+            transform: translateX(5px);
+        }
+        
+        .footer-links a:hover::before {
+            width: 30px;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeInDown {
+            from { 
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideInLeft {
+            from { 
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes slideInRight {
+            from { 
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes slideInDown {
+            from { 
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideInUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideDown {
+            from { 
+                opacity: 0;
+                transform: translateY(-100%);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0) scale(1); }
+            40% { transform: translateY(-10px) scale(1.05); }
+            60% { transform: translateY(-5px) scale(1.02); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Admin Override Modal */
+        .override-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .override-modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--pepsi-white);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            animation: slideInUp 0.3s ease-out;
+            border: 4px solid var(--pepsi-red);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--pepsi-blue);
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: var(--pepsi-red);
+            transition: transform 0.3s ease;
+        }
+        
+        .close-modal:hover {
+            transform: scale(1.2);
+        }
+        
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            z-index: 3000;
+            animation: slideInRight 0.3s ease-out;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .toast.success {
+            background: linear-gradient(135deg, var(--success), #1e7e34);
+            border-left: 4px solid #155724;
+        }
+        
+        .toast.error {
+            background: linear-gradient(135deg, var(--danger), #bd2130);
+            border-left: 4px solid #721c24;
+        }
+        
+        .toast.info {
+            background: linear-gradient(135deg, var(--pepsi-blue), #003366);
+            border-left: 4px solid #001a33;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .booking-container {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            
+            .booking-info {
+                order: -1;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: var(--pepsi-blue);
+                flex-direction: column;
+                padding: 1.5rem;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+                animation: slideInDown 0.3s ease-out;
+            }
+            
+            .nav-links.active {
+                display: flex;
+            }
+            
+            .booking-hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .booking-hero p {
+                font-size: 1.1rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+            
+            .booking-form-section, .booking-info {
+                padding: 25px;
+            }
+            
+            .product-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+            
+            .quantity-control {
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .booking-hero h1 {
+                font-size: 2rem;
+            }
+            
+            .section-title {
+                font-size: 1.6rem;
+            }
+            
+            .process-steps {
+                grid-template-columns: 1fr;
+            }
+            
+            .step-card {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header & Navigation -->
+    <header class="header">
+        <div class="container">
+            <nav class="nav-container">
+                <div class="logo-container">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Pepsi_2023.svg/640px-Pepsi_2023.svg.png" alt="Arijeem Logo" class="logo">
+                    <span class="company-name">Arijeem Enterprises</span>
+                </div>
+                
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="services.html"><i class="fas fa-concierge-bell"></i> Services</a></li>
+                    <li><a href="products.html"><i class="fas fa-wine-bottle"></i> Products</a></li>
+                    <li><a href="order.html"><i class="fas fa-shopping-cart"></i> Order</a></li>
+                    <li><a href="contact.html"><i class="fas fa-phone"></i> Contact</a></li>
+                    <li><a href="teams.html"><i class="fas fa-users"></i> Teams</a></li>
+                    <li><a href="promo-loyalty.html"><i class="fas fa-gift"></i> Promo & Loyalty</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Admin Controls -->
+    <div class="container">
+        <div class="admin-controls" id="adminControls">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="margin: 0; color: white;">
+                    <i class="fas fa-user-shield"></i> Admin Price Override Mode
+                </h3>
+                <button class="admin-toggle" id="adminExitBtn">
+                    <i class="fas fa-sign-out-alt"></i> Exit Admin Mode
+                </button>
+            </div>
+            <div class="price-override-controls" id="priceOverrideControls">
+                <!-- Price override inputs will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Hero -->
+    <section class="booking-hero">
+        <div class="container">
+            <h1>Book Bulk Orders & Events</h1>
+            <p>Plan your large orders, events, and special requirements in advance. Get dedicated support and customized solutions with dynamic wholesale pricing.</p>
+            <button class="admin-toggle" id="adminToggleBtn" style="margin-top: 20px; background: rgba(255,255,255,0.2); border: 2px solid white;">
+                <i class="fas fa-key"></i> Admin Price Override
+            </button>
+        </div>
+    </section>
+
+    <!-- Booking Container -->
+    <div class="container">
+        <div class="booking-container">
+            <!-- Booking Form -->
+            <div class="booking-form-section">
+                <h2 class="section-title">Bulk Order Booking Form</h2>
+                
+                <!-- Delivery Method Selection -->
+                <div class="form-group">
+                    <label class="form-label">Delivery Method</label>
+                    <div style="display: flex; gap: 20px; align-items: center;">
+                        <label style="font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                            <input type="radio" name="deliveryMethod" value="delivery" checked>
+                            <i class="fas fa-truck"></i> Delivery (₦100)
+                        </label>
+                        <label style="font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                            <input type="radio" name="deliveryMethod" value="pickup">
+                            <i class="fas fa-store"></i> Pickup (Free)
+                        </label>
+                    </div>
+                </div>
+                
+                <form id="bookingForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required" for="fullName">Full Name</label>
+                            <input type="text" id="fullName" class="form-input" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label required" for="phoneNumber">Phone Number</label>
+                            <input type="tel" id="phoneNumber" class="form-input" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="emailAddress">Email Address</label>
+                        <input type="email" id="emailAddress" class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label required" for="organization">Organization / Company</label>
+                        <input type="text" id="organization" class="form-input" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label required" for="eventType">Type of Booking</label>
+                        <select id="eventType" class="form-select" required>
+                            <option value="">Select event type</option>
+                            <option value="wedding">Wedding / Celebration</option>
+                            <option value="corporate">Corporate Event</option>
+                            <option value="conference">Conference / Seminar</option>
+                            <option value="religious">Religious Gathering</option>
+                            <option value="restaurant">Restaurant / Bar Supply</option>
+                            <option value="hotel">Hotel Supply</option>
+                            <option value="regular">Regular Bulk Supply</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required" for="eventDate">Event/Supply Date</label>
+                            <input type="date" id="eventDate" class="form-input" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="eventTime">Preferred Time</label>
+                            <select id="eventTime" class="form-select">
+                                <option value="morning">Morning (8am - 12pm)</option>
+                                <option value="afternoon">Afternoon (12pm - 4pm)</option>
+                                <option value="evening">Evening (4pm - 8pm)</option>
+                                <option value="flexible">Flexible</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label required" for="deliveryAddress">Delivery Address</label>
+                        <textarea id="deliveryAddress" class="form-textarea" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="specialRequirements">Special Requirements</label>
+                        <textarea id="specialRequirements" class="form-textarea" placeholder="Any special requests, setup needs, or additional services required"></textarea>
+                    </div>
+                    
+                    <!-- Product Selection -->
+                    <div class="product-selection">
+                        <h3 style="color: var(--pepsi-blue); margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-wine-bottle"></i> Products Needed
+                        </h3>
+                        
+                        <div id="productList">
+                            <!-- Products will be dynamically added -->
+                        </div>
+                        
+                        <button type="button" id="addProductBtn" class="admin-toggle" style="width: 100%; margin-top: 15px;">
+                            <i class="fas fa-plus"></i> Add Another Product
+                        </button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="estimatedGuests">Estimated Number of Guests</label>
+                        <input type="number" id="estimatedGuests" class="form-input" min="50" placeholder="For event planning">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="additionalNotes">Additional Notes</label>
+                        <textarea id="additionalNotes" class="form-textarea" placeholder="Setup instructions, contact person on site, access instructions, etc."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-calendar-check"></i> Submit Booking Request
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Booking Info -->
+            <div class="booking-info">
+                <h2 class="section-title">Booking Information</h2>
+                
+                <div class="info-card">
+                    <h3>Why Book in Advance?</h3>
+                    <ul class="info-list">
+                        <li><i class="fas fa-check-circle"></i> Guaranteed product availability</li>
+                        <li><i class="fas fa-check-circle"></i> Special event pricing</li>
+                        <li><i class="fas fa-check-circle"></i> Dedicated account manager</li>
+                        <li><i class="fas fa-check-circle"></i> Setup and logistics support</li>
+                        <li><i class="fas fa-check-circle"></i> Flexible payment terms</li>
+                    </ul>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Booking Process</h3>
+                    <ul class="info-list">
+                        <li><i class="fas fa-file-alt"></i> Submit booking request</li>
+                        <li><i class="fas fa-phone"></i> We contact you within 2 hours</li>
+                        <li><i class="fas fa-handshake"></i> Confirm details & pricing</li>
+                        <li><i class="fas fa-file-contract"></i> Receive quotation</li>
+                        <li><i class="fas fa-truck"></i> Delivery & setup on schedule</li>
+                    </ul>
+                </div>
+                
+                <!-- Pricing Calculator -->
+                <div class="pricing-calculator">
+                    <h3 class="calculator-title">Estimated Pricing</h3>
+                    <p>Add products above to see estimated total</p>
+                    
+                    <div class="calculator-result">
+                        <div style="margin-bottom: 10px; font-size: 1.1rem;">Estimated Total:</div>
+                        <div class="estimated-total" id="estimatedTotal">₦0</div>
+                        <div style="font-size: 0.9rem; margin-top: 10px; opacity: 0.9;">
+                            <i class="fas fa-info-circle"></i> Final price confirmed after discussion
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-card" style="margin-top: 30px; background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,165,0,0.1)); border-left: 4px solid var(--accent-gold);">
+                    <h3 style="color: var(--accent-gold);">Need Immediate Help?</h3>
+                    <p style="margin-bottom: 15px;">Call our bulk orders team for immediate assistance:</p>
+                    <div style="font-size: 1.4rem; font-weight: 700; color: white; background: var(--pepsi-blue); padding: 10px 15px; border-radius: 8px; display: inline-block;">
+                        <i class="fas fa-phone"></i> +234 803 123 4567
+                    </div>
+                    <p style="margin-top: 10px; font-size: 0.9rem; opacity: 0.8;">
+                        <i class="fas fa-clock"></i> Available 24/7 for urgent bookings
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Process -->
+    <section class="booking-process">
+        <div class="container">
+            <h2 class="section-title" style="text-align: center; color: var(--pepsi-blue);">Our Booking Process</h2>
+            
+            <div class="process-steps">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">
+                        <i class="fas fa-file-signature"></i>
+                    </div>
+                    <h3>Submit Request</h3>
+                    <p>Fill out our booking form with your requirements and event details</p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3>Consultation</h3>
+                    <p>Our team contacts you to discuss details and provide recommendations</p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+                    <h3>Quotation</h3>
+                    <p>Receive detailed quotation with pricing and service breakdown</p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <div class="step-icon">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <h3>Delivery & Setup</h3>
+                    <p>On-time delivery with professional setup at your venue</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admin Override Modal -->
+    <div class="override-modal" id="overrideModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="margin: 0; color: var(--pepsi-blue);">
+                    <i class="fas fa-user-shield"></i> Admin Access Required
+                </h2>
+                <button class="close-modal" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="adminCode">Enter Admin Code:</label>
+                <input type="password" id="adminCode" class="form-input" placeholder="Enter 6-digit admin code" maxlength="6">
+                <p style="margin-top: 10px; font-size: 0.9rem; color: #666;">
+                    <i class="fas fa-info-circle"></i> Default admin code: 123456
+                </p>
+            </div>
+            <button class="submit-btn" id="verifyAdminBtn" style="margin-top: 20px;">
+                <i class="fas fa-check"></i> Verify Admin Code
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>Arijeem Enterprises</h3>
+                    <p>Professional bulk order and event supply services. Reliable, efficient, and customized solutions for your needs.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="order.html">Place Order</a></li>
+                        <li><a href="book.html">Book Bulk Order</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-phone"></i> Bulk Orders: +234 803 123 4567</li>
+                        <li><i class="fas fa-phone"></i> Events Team: +234 902 876 5432</li>
+                        <li><i class="fas fa-envelope"></i> events@arijeementerprises.com</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Lagos, Nigeria</li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Booking Hours</h3>
+                    <ul class="footer-links">
+                        <li>Monday - Friday: 7am - 8pm</li>
+                        <li>Saturday: 8am - 6pm</li>
+                        <li>Sunday: 9am - 4pm</li>
+                        <li>24/7 Emergency Bookings</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2024 Arijeem Multipurpose Enterprises. All rights reserved. | Professional event and bulk order solutions</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Complete product database with retail/wholesale pricing and minimums
+        const bookingProducts = [
+            { 
+                id: 1, 
+                name: "Pep (Pepsi RGB)", 
+                type: "RGB", 
+                retailPrice: 4500, 
+                wholesalePrice: 4400, 
+                minWholesale: 50,
+                image: "pep.png",
+                description: "Pepsi in returnable glass bottle"
+            },
+            { 
+                id: 2, 
+                name: "Fanta (PET)", 
+                type: "PET", 
+                retailPrice: 2200, 
+                wholesalePrice: 2100, 
+                minWholesale: 50,
+                image: "fanta.png",
+                description: "Fanta orange in PET bottle"
+            },
+            { 
+                id: 3, 
+                name: "Mirinda (PET)", 
+                type: "PET", 
+                retailPrice: 2320, 
+                wholesalePrice: 2300, 
+                minWholesale: 50,
+                image: "mirinda.png",
+                description: "Mirinda orange in PET bottle"
+            },
+            { 
+                id: 4, 
+                name: "Big Coke RGB", 
+                type: "RGB", 
+                retailPrice: 6000, 
+                wholesalePrice: 6000, 
+                minWholesale: 50,
+                image: "bigcokergb.png",
+                description: "Large Coke in returnable glass"
+            },
+            { 
+                id: 5, 
+                name: "7UP Glass", 
+                type: "RGB", 
+                retailPrice: 3000, 
+                wholesalePrice: 2950, 
+                minWholesale: 50,
+                image: "7up-glass.png",
+                description: "7UP in returnable glass bottle"
+            },
+            { 
+                id: 6, 
+                name: "Nirvana", 
+                type: "Water", 
+                retailPrice: 1400, 
+                wholesalePrice: 1300, 
+                minWholesale: 50,
+                image: "nirvana.png",
+                description: "Premium bottled water"
+            },
+            { 
+                id: 7, 
+                name: "Aquafina", 
+                type: "Water", 
+                retailPrice: 2200, 
+                wholesalePrice: 2150, 
+                minWholesale: 50,
+                image: "aquafina.png",
+                description: "Aquafina purified water"
+            },
+            { 
+                id: 8, 
+                name: "Dubic Malt (Can)", 
+                type: "Cans", 
+                retailPrice: 12000, 
+                wholesalePrice: 11000, 
+                minWholesale: 30,
+                image: "dubic-malt.png",
+                description: "Dubic malt in aluminum can"
+            },
+            { 
+                id: 9, 
+                name: "Plastic Coke (PET)", 
+                type: "PET", 
+                retailPrice: 2100, 
+                wholesalePrice: 2100, 
+                minWholesale: 50,
+                image: "plastic-coke.png",
+                description: "Coca-Cola in PET bottle"
+            },
+            { 
+                id: 10, 
+                name: "Komma (SK RGB)", 
+                type: "RGB", 
+                retailPrice: 3120, 
+                wholesalePrice: 3050, 
+                minWholesale: 50,
+                image: "komma.png",
+                description: "SK soda in glass bottle"
+            }
+        ];
+
+        // Admin override storage
+        let priceOverrides = JSON.parse(localStorage.getItem('priceOverrides')) || {};
+        let isAdminMode = localStorage.getItem('isAdminMode') === 'true';
+        let productCounter = 0;
+
+        // DOM Elements
+        const adminControls = document.getElementById('adminControls');
+        const adminToggleBtn = document.getElementById('adminToggleBtn');
+        const overrideModal = document.getElementById('overrideModal');
+        const closeModal = document.getElementById('closeModal');
+        const verifyAdminBtn = document.getElementById('verifyAdminBtn');
+        const adminCodeInput = document.getElementById('adminCode');
+        const adminExitBtn = document.getElementById('adminExitBtn');
+        const priceOverrideControls = document.getElementById('priceOverrideControls');
+        const addProductBtn = document.getElementById('addProductBtn');
+        const productList = document.getElementById('productList');
+        const estimatedTotal = document.getElementById('estimatedTotal');
+        const bookingForm = document.getElementById('bookingForm');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const navLinks = document.getElementById('navLinks');
+
+        // Initialize Admin Mode
+        if (isAdminMode) {
+            adminControls.classList.add('active');
+            showToast('Admin mode activated', 'info');
+        }
+
+        // Mobile Menu Toggle
+        mobileMenuBtn.addEventListener('click', function() {
+            navLinks.classList.toggle('active');
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!navLinks.contains(event.target) && !mobileMenuBtn.contains(event.target)) {
+                navLinks.classList.remove('active');
+            }
+        });
+
+        // Add active class to current page link
+        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            const linkPage = link.getAttribute('href');
+            if (linkPage === currentPage) {
+                link.style.background = 'rgba(255,255,255,0.2)';
+                link.style.fontWeight = '600';
+            }
+        });
+
+        // Calculate price based on quantity and admin overrides
+        function calculatePrice(product, quantity) {
+            // Check for admin override first
+            if (priceOverrides[product.id]) {
+                return {
+                    price: priceOverrides[product.id],
+                    type: 'custom',
+                    label: 'Custom Price'
+                };
+            }
+            
+            // Check if quantity qualifies for wholesale
+            if (quantity >= product.minWholesale) {
+                return {
+                    price: product.wholesalePrice,
+                    type: 'wholesale',
+                    label: 'Wholesale Price'
+                };
+            }
+            
+            return {
+                price: product.retailPrice,
+                type: 'retail',
+                label: 'Retail Price'
+            };
+        }
+
+        // Add product row
+        function addProductRow(product = null) {
+            const productId = productCounter++;
+            
+            const productRow = document.createElement('div');
+            productRow.className = 'product-item';
+            productRow.id = `productRow-${productId}`;
+            
+            const productOptions = bookingProducts.map(p => 
+                `<option value="${p.id}" ${product && product.id === p.id ? 'selected' : ''}>
+                    ${p.name} - Retail: ₦${p.retailPrice} | Wholesale: ₦${p.wholesalePrice} (${p.minWholesale}+)
+                </option>`
+            ).join('');
+            
+            productRow.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <div style="flex: 2;">
+                        <select class="form-select product-select" onchange="updateProductPrice(${productId})" style="width: 100%;">
+                            <option value="">Select Product</option>
+                            ${productOptions}
+                        </select>
+                    </div>
+                    <div style="margin: 0 15px;">
+                        <div class="quantity-control">
+                            <button class="qty-btn" onclick="updateProductQuantity(${productId}, -1)">-</button>
+                            <input type="number" class="qty-input product-qty" id="qty-${productId}" 
+                                   value="${product ? product.quantity : 50}" min="1" 
+                                   oninput="updateProductPrice(${productId})">
+                            <button class="qty-btn" onclick="updateProductQuantity(${productId}, 1)">+</button>
+                        </div>
+                    </div>
+                    <div style="flex: 1.5; text-align: right;">
+                        <div class="price-display" id="priceDisplay-${productId}">₦0</div>
+                        <div style="font-size: 0.8rem; color: #666;" id="priceType-${productId}"></div>
+                    </div>
+                    <div style="margin-left: 10px;">
+                        <button type="button" class="qty-btn" onclick="removeProductRow(${productId})" 
+                                style="background: var(--danger); color: white; border: none;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            productList.appendChild(productRow);
+            
+            if (product) {
+                updateProductPrice(productId);
+            }
+            
+            updateTotal();
+        }
+
+        // Update product quantity
+        window.updateProductQuantity = function(productId, change) {
+            const input = document.getElementById(`qty-${productId}`);
+            let value = parseInt(input.value) || 0;
+            value = Math.max(1, value + change);
+            input.value = value;
+            updateProductPrice(productId);
+        }
+
+        // Update product price display
+        window.updateProductPrice = function(productId) {
+            const row = document.getElementById(`productRow-${productId}`);
+            const select = row.querySelector('.product-select');
+            const qtyInput = row.querySelector('.product-qty');
+            const priceDisplay = document.getElementById(`priceDisplay-${productId}`);
+            const priceType = document.getElementById(`priceType-${productId}`);
+            
+            const selectedProduct = bookingProducts.find(p => p.id === parseInt(select.value));
+            
+            if (selectedProduct) {
+                const quantity = parseInt(qtyInput.value) || 0;
+                const priceInfo = calculatePrice(selectedProduct, quantity);
+                const total = priceInfo.price * quantity;
+                
+                priceDisplay.textContent = `₦${total.toLocaleString()}`;
+                priceDisplay.className = `price-display ${priceInfo.type}`;
+                priceType.textContent = priceInfo.label;
+                
+                if (priceInfo.type === 'custom') {
+                    priceType.style.color = 'var(--warning)';
+                    priceType.innerHTML = `<i class="fas fa-star"></i> ${priceInfo.label}`;
+                } else if (priceInfo.type === 'wholesale') {
+                    priceType.style.color = 'var(--pepsi-red)';
+                    priceType.innerHTML = `<i class="fas fa-boxes"></i> ${priceInfo.label}`;
+                } else {
+                    priceType.style.color = 'var(--success)';
+                    priceType.innerHTML = `<i class="fas fa-shopping-cart"></i> ${priceInfo.label}`;
+                }
+            } else {
+                priceDisplay.textContent = '₦0';
+                priceDisplay.className = 'price-display';
+                priceType.textContent = '';
+            }
+            
+            updateTotal();
+        }
+
+        // Remove product row
+        window.removeProductRow = function(productId) {
+            const row = document.getElementById(`productRow-${productId}`);
+            if (row) {
+                row.style.transform = 'translateX(100%)';
+                row.style.opacity = '0';
+                setTimeout(() => {
+                    row.remove();
+                    updateTotal();
+                }, 300);
+            }
+        }
+
+        // Update total calculation
+        function updateTotal() {
+            let total = 0;
+            
+            document.querySelectorAll('.product-item').forEach(row => {
+                const priceDisplay = row.querySelector('.price-display');
+                const priceText = priceDisplay.textContent.replace('₦', '').replace(/,/g, '');
+                const price = parseFloat(priceText) || 0;
+                total += price;
+            });
+            
+            // Add service fee for events
+            const eventType = document.getElementById('eventType').value;
+            const isEvent = ['wedding', 'corporate', 'conference', 'religious'].includes(eventType);
+            
+            if (isEvent && total > 0) {
+                const serviceFee = total * 0.10;
+                total += serviceFee;
+            }
+            
+            // Add delivery fee if selected
+            const deliveryMethod = document.querySelector('input[name="deliveryMethod"]:checked')?.value || 'delivery';
+            if (deliveryMethod === 'delivery') {
+                total += 100;
+            }
+            
+            // Animate total update
+            const currentTotal = parseFloat(estimatedTotal.textContent.replace('₦', '').replace(/,/g, '')) || 0;
+            const newTotal = Math.round(total);
+            
+            if (currentTotal !== newTotal) {
+                animateCount(estimatedTotal, currentTotal, newTotal);
+            }
+        }
+
+        // Animate number counting
+        function animateCount(element, start, end) {
+            const duration = 500;
+            const steps = 60;
+            const stepValue = (end - start) / steps;
+            let current = start;
+            let step = 0;
+            
+            const timer = setInterval(() => {
+                current += stepValue;
+                step++;
+                
+                if (step >= steps) {
+                    current = end;
+                    clearInterval(timer);
+                }
+                
+                element.textContent = `₦${Math.round(current).toLocaleString()}`;
+            }, duration / steps);
+        }
+
+        // Add product button
+        addProductBtn.addEventListener('click', () => {
+            addProductRow();
+            showToast('Product row added', 'info');
+        });
+
+        // Set minimum date to tomorrow
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const eventDateInput = document.getElementById('eventDate');
+        if (eventDateInput) {
+            eventDateInput.min = tomorrow.toISOString().split('T')[0];
+            
+            // Set default date to 3 days from now
+            const defaultDate = new Date();
+            defaultDate.setDate(defaultDate.getDate() + 3);
+            eventDateInput.valueAsDate = defaultDate;
+        }
+
+        // Event listeners for dynamic updates
+        const eventTypeSelect = document.getElementById('eventType');
+        if (eventTypeSelect) {
+            eventTypeSelect.addEventListener('change', updateTotal);
+        }
+
+        // Delivery method change listener
+        document.querySelectorAll('input[name="deliveryMethod"]').forEach(radio => {
+            radio.addEventListener('change', updateTotal);
+        });
+
+        // Event date validation
+        if (eventDateInput) {
+            eventDateInput.addEventListener('change', function() {
+                const selectedDate = new Date(this.value);
+                const today = new Date();
+                const minDate = new Date(today);
+                minDate.setDate(today.getDate() + 2);
+                
+                if (selectedDate < minDate) {
+                    showToast('For event bookings, please select a date at least 2 days from now.', 'error');
+                    this.value = minDate.toISOString().split('T')[0];
+                }
+            });
+        }
+
+        // Form submission
+        bookingForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Gather product data
+            const products = [];
+            document.querySelectorAll('.product-item').forEach(row => {
+                const select = row.querySelector('.product-select');
+                const qtyInput = row.querySelector('.product-qty');
+                const priceDisplay = row.querySelector('.price-display');
+                const priceType = row.querySelector('[id^="priceType-"]');
+                
+                if (select.value && qtyInput.value) {
+                    const product = bookingProducts.find(p => p.id === parseInt(select.value));
+                    if (product) {
+                        products.push({
+                            name: product.name,
+                            quantity: qtyInput.value,
+                            unitPrice: priceDisplay.textContent.replace('₦', '').replace(/,/g, '') / qtyInput.value,
+                            total: priceDisplay.textContent,
+                            priceType: priceType.textContent
+                        });
+                    }
+                }
+            });
+            
+            // Validate at least one product
+            if (products.length === 0) {
+                showToast('Please add at least one product to your booking', 'error');
+                return;
+            }
+            
+            // Gather form data
+            const formData = {
+                fullName: document.getElementById('fullName').value,
+                phoneNumber: document.getElementById('phoneNumber').value,
+                emailAddress: document.getElementById('emailAddress').value,
+                organization: document.getElementById('organization').value,
+                eventType: document.getElementById('eventType').value,
+                eventDate: document.getElementById('eventDate').value,
+                eventTime: document.getElementById('eventTime').value,
+                deliveryAddress: document.getElementById('deliveryAddress').value,
+                specialRequirements: document.getElementById('specialRequirements').value,
+                estimatedGuests: document.getElementById('estimatedGuests').value,
+                additionalNotes: document.getElementById('additionalNotes').value,
+                deliveryMethod: document.querySelector('input[name="deliveryMethod"]:checked')?.value || 'delivery',
+                products: products,
+                estimatedTotal: estimatedTotal.textContent,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Create booking summary
+            let bookingSummary = `BOOKING REQUEST CONFIRMATION\n`;
+            bookingSummary += `==========================\n`;
+            bookingSummary += `Booking Type: ${formData.eventType.toUpperCase()}\n`;
+            bookingSummary += `Organization: ${formData.organization}\n`;
+            bookingSummary += `Contact: ${formData.fullName} - ${formData.phoneNumber}\n`;
+            bookingSummary += `Event Date: ${new Date(formData.eventDate).toLocaleDateString()}\n`;
+            bookingSummary += `Delivery Method: ${formData.deliveryMethod === 'delivery' ? 'Delivery (₦100)' : 'Pickup (Free)'}\n`;
+            bookingSummary += `Delivery Address: ${formData.deliveryAddress}\n\n`;
+            bookingSummary += `PRODUCTS REQUESTED:\n`;
+            
+            formData.products.forEach(product => {
+                bookingSummary += `- ${product.name}: ${product.quantity} units @ ₦${product.unitPrice} (${product.priceType}) = ${product.total}\n`;
+            });
+            
+            bookingSummary += `\nEstimated Total: ${formData.estimatedTotal}\n\n`;
+            bookingSummary += `SPECIAL REQUIREMENTS:\n${formData.specialRequirements || 'None'}\n\n`;
+            bookingSummary += `Thank you for your booking request! Our events team will contact you within 2 hours to confirm details and provide a final quotation.`;
+            
+            // Show confirmation
+            alert(bookingSummary);
+            
+            // Reset form
+            bookingForm.reset();
+            productList.innerHTML = '';
+            estimatedTotal.textContent = '₦0';
+            
+            // Reset date to default
+            if (eventDateInput) {
+                const defaultDate = new Date();
+                defaultDate.setDate(defaultDate.getDate() + 3);
+                eventDateInput.valueAsDate = defaultDate;
+            }
+            
+            showToast('Booking request submitted successfully! We will contact you shortly.', 'success');
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Show Toast Notification
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideInRight 0.3s ease-out reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Admin Mode Functions
+        adminToggleBtn.addEventListener('click', () => {
+            overrideModal.classList.add('active');
+        });
+
+        closeModal.addEventListener('click', () => {
+            overrideModal.classList.remove('active');
+            adminCodeInput.value = '';
+        });
+
+        verifyAdminBtn.addEventListener('click', () => {
+            const adminCode = adminCodeInput.value;
+            if (adminCode === '123456') {
+                isAdminMode = true;
+                localStorage.setItem('isAdminMode', 'true');
+                adminControls.classList.add('active');
+                overrideModal.classList.remove('active');
+                adminCodeInput.value = '';
+                showToast('Admin mode activated successfully!', 'success');
+                loadPriceOverrideControls();
+            } else {
+                showToast('Invalid admin code!', 'error');
+            }
+        });
+
+        adminExitBtn.addEventListener('click', () => {
+            isAdminMode = false;
+            localStorage.setItem('isAdminMode', 'false');
+            adminControls.classList.remove('active');
+            showToast('Admin mode deactivated', 'info');
+            
+            // Update all product prices to remove custom overrides
+            document.querySelectorAll('.product-item').forEach(row => {
+                const productId = row.id.replace('productRow-', '');
+                updateProductPrice(productId);
+            });
+        });
+
+        // Load Price Override Controls
+        function loadPriceOverrideControls() {
+            priceOverrideControls.innerHTML = '';
+            
+            bookingProducts.forEach(product => {
+                const overridePrice = priceOverrides[product.id] || '';
+                
+                const controlDiv = document.createElement('div');
+                controlDiv.style.display = 'flex';
+                controlDiv.style.gap = '10px';
+                controlDiv.style.alignItems = 'center';
+                controlDiv.style.background = 'rgba(255,255,255,0.2)';
+                controlDiv.style.padding = '15px';
+                controlDiv.style.borderRadius = '10px';
+                controlDiv.style.marginBottom = '10px';
+                
+                controlDiv.innerHTML = `
+                    <div style="flex: 1;">
+                        <strong style="color: white;">${product.name}</strong>
+                        <div style="font-size: 0.8rem; opacity: 0.8; color: white;">
+                            Retail: ₦${product.retailPrice} | Wholesale: ₦${product.wholesalePrice} (${product.minWholesale}+)
+                        </div>
+                    </div>
+                    <input type="number" 
+                           id="override-${product.id}" 
+                           value="${overridePrice}" 
+                           placeholder="Custom price" 
+                           style="width: 120px; padding: 8px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: white;">
+                    <button onclick="savePriceOverride(${product.id})" 
+                            style="padding: 8px 15px; background: white; color: var(--pepsi-red); border: none; border-radius: 5px; cursor: pointer; font-weight: 600;">
+                        Save
+                    </button>
+                `;
+                
+                priceOverrideControls.appendChild(controlDiv);
+            });
+        }
+
+        // Save Price Override
+        window.savePriceOverride = function(productId) {
+            const input = document.getElementById(`override-${productId}`);
+            const price = parseInt(input.value);
+            
+            if (price && price > 0) {
+                priceOverrides[productId] = price;
+                localStorage.setItem('priceOverrides', JSON.stringify(priceOverrides));
+                showToast('Price override saved!', 'success');
+                
+                // Update any existing product rows with this product
+                document.querySelectorAll('.product-item').forEach(row => {
+                    const select = row.querySelector('.product-select');
+                    if (parseInt(select.value) === productId) {
+                        const productId = row.id.replace('productRow-', '');
+                        updateProductPrice(productId);
+                    }
+                });
+            } else if (price === 0 || !price) {
+                delete priceOverrides[productId];
+                localStorage.setItem('priceOverrides', JSON.stringify(priceOverrides));
+                showToast('Price override removed!', 'info');
+                
+                // Update any existing product rows with this product
+                document.querySelectorAll('.product-item').forEach(row => {
+                    const select = row.querySelector('.product-select');
+                    if (parseInt(select.value) === productId) {
+                        const productId = row.id.replace('productRow-', '');
+                        updateProductPrice(productId);
+                    }
+                });
+            }
+        }
+
+        // Initialize with one product row
+        document.addEventListener('DOMContentLoaded', () => {
+            addProductRow();
+            
+            // Add CSS for animations
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                
+                @keyframes slideOut {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>

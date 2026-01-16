@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promotions & Loyalty - Arijeem Enterprises</title>
+    <link rel="icon" type="image/x-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Pepsi_2023.svg/640px-Pepsi_2023.svg.png">
+    <style>
+        /* Shared navigation + animations (matches teams.html nav + order.html animations) */
+
+:root{
+  --primary:#004B93; --secondary:#FF0000; --accent:#FFD700;
+  --light:#f8f9fa; --dark:#212529; --success:#28a745;
+  --pepsi-blue:#004B93; --pepsi-red:#FF0000;
+}
+
+/* Header & nav */
+.header{
+  background: linear-gradient(135deg,var(--primary) 0%,#002954 100%);
+  color:#fff;padding:1rem 0;position:fixed;width:100%;top:0;z-index:1000;
+  box-shadow:0 4px 20px rgba(0,0,0,0.1);
+}
+.container{max-width:1200px;margin:0 auto;padding:0 20px;}
+.nav-container{display:flex;justify-content:space-between;align-items:center;}
+.logo-container{display:flex;align-items:center;gap:15px;}
+.logo{height:45px;width:45px;background:#fff;border-radius:50%;padding:5px;box-shadow:0 0 10px rgba(255,255,255,0.3);transition:transform .3s;}
+.logo:hover{transform:scale(1.05);}
+.company-name{font-size:1.5rem;font-weight:700;color:#fff;}
+.mobile-menu-btn{display:none;background:none;border:none;color:white;font-size:1.8rem;cursor:pointer;}
+
+/* Nav links */
+.nav-links{display:flex;gap:2rem;list-style:none;}
+.nav-links a{color:white;text-decoration:none;font-weight:500;padding:.5rem 1rem;border-radius:4px;transition:all .3s;display:flex;align-items:center;gap:8px;}
+.nav-links a i{font-size:1.1rem;}
+.nav-links a:hover{background:rgba(255,255,255,0.12);transform:translateY(-2px);}
+
+/* Responsive nav behavior */
+@media(max-width:768px){
+  .mobile-menu-btn{display:block;}
+  .nav-links{display:none;position:absolute;top:100%;left:0;width:100%;background:var(--primary);flex-direction:column;padding:1rem;box-shadow:0 10px 20px rgba(0,0,0,0.1);}
+  .nav-links.active{display:flex;}
+}
+
+/* Consistent small animations & toasts used across pages */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeInDown{from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:none}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+@keyframes slideInLeft{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:none}}
+@keyframes slideInRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+@keyframes slideInDown{from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:none}}
+@keyframes slideInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+@keyframes bounce{0%,20%,50%,80%,100%{transform:translateY(0)}40%{transform:translateY(-10px)}60%{transform:translateY(-5px)}}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
+
+/* Toast */
+.toast{position:fixed;top:100px;right:20px;padding:12px 18px;border-radius:10px;color:#fff;z-index:3000;animation:slideInRight .3s}
+.toast.success{background:linear-gradient(135deg,var(--success),#1e7e34)}
+.toast.error{background:linear-gradient(135deg,#dc3545,#bd2130)}
+.toast.info{background:linear-gradient(135deg,var(--pepsi-blue),#003366)}
+
+/* Small helper classes used by nav scripts */
+.nav-active{transform:translateY(-3px);}
+
+/* ensure consistent focus/hover for nav buttons */
+.nav-links a:focus{outline:2px solid rgba(255,255,255,0.12);outline-offset:2px}
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: var(--light);
+        }
+        
+        /* Pepsi-Inspired Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, #002954 100%);
+            color: white;
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo {
+            height: 45px;
+            width: 45px;
+            background: white;
+            border-radius: 50%;
+            padding: 5px;
+            box-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
+        
+        .logo:hover {
+            transform: scale(1.1);
+        }
+        
+        .company-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-links a i {
+            font-size: 1.1rem;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+        }
+        
+        /* Offline / maintenance message */
+        .offline-note {
+            min-height: calc(100vh - 140px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #fff 0%, #f6f7fb 100%);
+        }
+        .offline-note h1 {
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+        .offline-note p { color: #666; font-size:1rem; }
+
+        /* Hide regular promo/loyalty content while offline message active */
+        .promo-section,
+        .loyalty-section,
+        .rewards-section,
+        .referral-section,
+        .points-tracker {
+            display: none !important;
+        }
+        
+        /* Promo Hero */
+        .promo-hero {
+            background: linear-gradient(135deg, var(--secondary) 0%, #cc0000 100%);
+            color: white;
+            padding: 140px 0 60px;
+            text-align: center;
+            margin-top: 73px;
+        }
+        
+        .promo-hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .promo-hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            opacity: 0.95;
+        }
+        
+        /* Promo Grid */
+        .promo-section {
+            padding: 80px 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 3rem;
+        }
+        
+        .promo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        
+        .promo-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .promo-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+        }
+        
+        .promo-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--secondary);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            z-index: 2;
+        }
+        
+        .promo-image {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+        }
+        
+        .promo-content {
+            padding: 30px;
+        }
+        
+        .promo-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .promo-description {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .promo-details {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .promo-code {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-top: 10px;
+        }
+        
+        .promo-cta {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, var(--secondary), #ff3333);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .promo-cta:hover {
+            background: linear-gradient(45deg, #ff3333, var(--secondary));
+            transform: translateY(-2px);
+        }
+        
+        /* Loyalty Program */
+        .loyalty-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 80px 0;
+        }
+        
+        .loyalty-tiers {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .tier-card {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        .tier-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .tier-card.featured {
+            border: 3px solid var(--accent);
+            transform: scale(1.05);
+        }
+        
+        .tier-card.featured:hover {
+            transform: scale(1.05) translateY(-10px);
+        }
+        
+        .tier-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--accent);
+            color: var(--dark);
+            padding: 8px 25px;
+            font-weight: 700;
+            transform: rotate(45deg) translate(30%, -50%);
+        }
+        
+        .tier-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .tier-name {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .tier-requirements {
+            color: #666;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .tier-benefits {
+            list-style: none;
+            text-align: left;
+        }
+        
+        .tier-benefits li {
+            padding: 10px 0;
+            border-bottom: 1px solid #f8f9fa;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tier-benefits li i {
+            color: var(--success);
+        }
+        
+        /* Rewards Catalog */
+        .rewards-section {
+            padding: 80px 0;
+        }
+        
+        .rewards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .reward-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .reward-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+        }
+        
+        .reward-image {
+            height: 180px;
+            width: 100%;
+            object-fit: cover;
+        }
+        
+        .reward-content {
+            padding: 25px;
+        }
+        
+        .reward-title {
+            font-size: 1.3rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .reward-points {
+            display: inline-block;
+            background: var(--accent);
+            color: var(--dark);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        
+        /* Loyalty Points Tracker */
+        .points-tracker {
+            background: linear-gradient(135deg, var(--primary) 0%, #002954 100%);
+            color: white;
+            padding: 50px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 40px 0;
+        }
+        
+        .points-display {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin: 20px 0;
+        }
+        
+        .points-progress {
+            height: 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            margin: 30px 0;
+            overflow: hidden;
+        }
+        
+        .points-progress-bar {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 10px;
+            transition: width 1s ease;
+        }
+        
+        /* Referral Program */
+        .referral-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 80px 0;
+        }
+        
+        .referral-card {
+            background: white;
+            padding: 50px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .referral-code {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 1.5rem;
+            letter-spacing: 3px;
+            margin: 30px 0;
+            border: 2px dashed var(--primary);
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--primary);
+            color: white;
+            padding: 60px 0 30px;
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-section h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 10px;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .tier-card.featured {
+                transform: scale(1);
+            }
+            
+            .tier-card.featured:hover {
+                transform: translateY(-10px);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: var(--primary);
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            }
+            
+            .nav-links.active {
+                display: flex;
+            }
+            
+            .promo-hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .points-display {
+                font-size: 3rem;
+            }
+            
+            .referral-card {
+                padding: 30px 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .promo-hero h1 {
+                font-size: 1.8rem;
+            }
+            
+            .promo-grid, .loyalty-tiers, .rewards-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .points-tracker {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header & Navigation -->
+    <header class="header">
+        <div class="container">
+            <nav class="nav-container">
+                <div class="logo-container">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Pepsi_2023.svg/640px-Pepsi_2023.svg.png" alt="Arijeem Logo" class="logo">
+                    <span class="company-name">Arijeem Enterprises</span>
+                </div>
+                
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+               <ul class="nav-links" id="navLinks">
+                    <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="services.html"><i class="fas fa-concierge-bell"></i> Services</a></li>
+                    <li><a href="products.html"><i class="fas fa-wine-bottle"></i> Products</a></li>
+                    <li><a href="order.html"><i class="fas fa-shopping-cart"></i> Order</a></li>
+                    <li><a href="contact.html"><i class="fas fa-phone"></i> Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Offline message: site currently not showing programs -->
+    <section class="offline-note" aria-live="polite" role="status">
+        <div>
+            <h1>No program — come back later</h1>
+            <p>We're updating our promotions and loyalty program. Please check back soon.</p>
+        </div>
+    </section>
+
+    <!-- Order Hero -->
+    <section class="promo-hero">
+        <div class="container">
+            <h1>Exclusive Promotions & Loyalty Rewards</h1>
+            <p>Enjoy special offers, discounts, and rewards for being a valued customer of Arijeem Enterprises.</p>
+        </div>
+    </section>
+
+    <!-- Current Promotions -->
+    <section class="promo-section">
+        <div class="container">
+            <h2 class="section-title">Current Promotions</h2>
+            
+            <div class="promo-grid">
+                <!-- Wholesale Bonus -->
+                <div class="promo-card">
+                    <span class="promo-badge">Limited Time</span>
+                    <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" alt="Wholesale Bonus" class="promo-image">
+                    <div class="promo-content">
+                        <h3 class="promo-title">Wholesale Volume Bonus</h3>
+                        <p class="promo-description">Order 100+ cases of any product and receive an extra 5% discount on your total order.</p>
+                        
+                        <div class="promo-details">
+                            <p><strong>Valid Until:</strong> December 31, 2024</p>
+                            <p><strong>Minimum Order:</strong> 100 cases</p>
+                            <div class="promo-code">CODE: WHOLESALE5</div>
+                        </div>
+                        
+                        <a href="order.html" class="promo-cta">
+                            <i class="fas fa-shopping-cart"></i> Claim This Offer
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- New Customer Offer -->
+                <div class="promo-card">
+                    <span class="promo-badge">New Customers</span>
+                    <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" alt="New Customer Offer" class="promo-image">
+                    <div class="promo-content">
+                        <h3 class="promo-title">First Order Discount</h3>
+                        <p class="promo-description">New customers get 15% off their first order of ₦50,000 or more.</p>
+                        
+                        <div class="promo-details">
+                            <p><strong>Valid For:</strong> First-time customers only</p>
+                            <p><strong>Minimum Order:</strong> ₦50,000</p>
+                            <div class="promo-code">CODE: WELCOME15</div>
+                        </div>
+                        
+                        <a href="order.html" class="promo-cta">
+                            <i class="fas fa-gift"></i> Get Your Discount
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Event Package -->
+                <div class="promo-card">
+                    <span class="promo-badge">Event Special</span>
+                    <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" alt="Event Package" class="promo-image">
+                    <div class="promo-content">
+                        <h3 class="promo-title">Complete Event Package</h3>
+                        <p class="promo-description">Book our complete beverage package for events and get free delivery and setup.</p>
+                        
+                        <div class="promo-details">
+                            <p><strong>Package Includes:</strong> 5 beverage varieties</p>
+                            <p><strong>Minimum:</strong> 200 guests</p>
+                            <div class="promo-code">CODE: EVENTFREE</div>
+                        </div>
+                        
+                        <a href="book.html" class="promo-cta">
+                            <i class="fas fa-calendar-check"></i> Book Event Package
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Loyalty Program -->
+    <section class="loyalty-section">
+        <div class="container">
+            <h2 class="section-title">Loyalty Program Tiers</h2>
+            
+            <div class="loyalty-tiers">
+                <!-- Bronze Tier -->
+                <div class="tier-card">
+                    <div class="tier-icon">
+                        <i class="fas fa-medal"></i>
+                    </div>
+                    <h3 class="tier-name">Bronze Tier</h3>
+                    <div class="tier-requirements">
+                        <p>₦100,000+ annual spend</p>
+                    </div>
+                    <ul class="tier-benefits">
+                        <li><i class="fas fa-check-circle"></i> 2% points on all purchases</li>
+                        <li><i class="fas fa-check-circle"></i> Priority customer support</li>
+                        <li><i class="fas fa-check-circle"></i> Monthly promo codes</li>
+                        <li><i class="fas fa-check-circle"></i> Birthday discount</li>
+                    </ul>
+                </div>
+                
+                <!-- Silver Tier -->
+                <div class="tier-card featured">
+                    <div class="tier-badge">POPULAR</div>
+                    <div class="tier-icon">
+                        <i class="fas fa-medal"></i>
+                    </div>
+                    <h3 class="tier-name">Silver Tier</h3>
+                    <div class="tier-requirements">
+                        <p>₦500,000+ annual spend</p>
+                    </div>
+                    <ul class="tier-benefits">
+                        <li><i class="fas fa-check-circle"></i> 5% points on all purchases</li>
+                        <li><i class="fas fa-check-circle"></i> Free delivery on orders over ₦30,000</li>
+                        <li><i class="fas fa-check-circle"></i> Dedicated account manager</li>
+                        <li><i class="fas fa-check-circle"></i> Quarterly business review</li>
+                        <li><i class="fas fa-check-circle"></i> Early access to promotions</li>
+                    </ul>
+                </div>
+                
+                <!-- Gold Tier -->
+                <div class="tier-card">
+                    <div class="tier-icon">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <h3 class="tier-name">Gold Tier</h3>
+                    <div class="tier-requirements">
+                        <p>₦1,000,000+ annual spend</p>
+                    </div>
+                    <ul class="tier-benefits">
+                        <li><i class="fas fa-check-circle"></i> 10% points on all purchases</li>
+                        <li><i class="fas fa-check-circle"></i> Free delivery on all orders</li>
+                        <li><i class="fas fa-check-circle"></i> 24/7 priority support</li>
+                        <li><i class="fas fa-check-circle"></i> Customized beverage solutions</li>
+                        <li><i class="fas fa-check-circle"></i> Exclusive VIP events</li>
+                        <li><i class="fas fa-check-circle"></i> Annual loyalty bonus</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Points Tracker -->
+    <section class="container">
+        <div class="points-tracker">
+            <h2 style="font-size: 2rem; margin-bottom: 20px;">Your Loyalty Points</h2>
+            <p>Track your points and see how close you are to the next tier</p>
+            
+            <div class="points-display" id="pointsDisplay">1,250</div>
+            <div>Total Points</div>
+            
+            <div class="points-progress">
+                <div class="points-progress-bar" id="pointsProgress" style="width: 25%;"></div>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
+                <div>Bronze: 0</div>
+                <div>Silver: 5,000</div>
+                <div>Gold: 10,000</div>
+            </div>
+            
+            <p style="margin-bottom: 20px;">Next Tier: Silver (3,750 points needed)</p>
+            <a href="order.html" class="promo-cta" style="max-width: 300px; margin: 0 auto;">
+                <i class="fas fa-bolt"></i> Earn More Points
+            </a>
+        </div>
+    </section>
+
+    <!-- Rewards Catalog -->
+    <section class="rewards-section">
+        <div class="container">
+            <h2 class="section-title">Redeem Your Points</h2>
+            
+            <div class="rewards-grid">
+                <div class="reward-card">
+                    <img src="https://images.unsplash.com/photo-1629198720836-0f7d2d6e7652?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" alt="Product Discount" class="reward-image">
+                    <div class="reward-content">
+                        <h3 class="reward-title">₦5,000 Product Credit</h3>
+                        <div class="reward-points">500 Points</div>
+                        <p>Redeem for credit on your next order</p>
+                    </div>
+                </div>
+                
+                <div class="reward-card">
+                    <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" alt="Free Delivery" class="reward-image">
+                    <div class="reward-content">
+                        <h3 class="reward-title">Free Delivery Pass</h3>
+                        <div class="reward-points">300 Points</div>
+                        <p>Free delivery on your next 3 orders</p>
+                    </div>
+                </div>
+                
+                <div class="reward-card">
+                    <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" alt="Gift Bundle" class="reward-image">
+                    <div class="reward-content">
+                        <h3 class="reward-title">Premium Gift Bundle</h3>
+                        <div class="reward-points">1,000 Points</div>
+                        <p>Curated selection of premium beverages</p>
+                    </div>
+                </div>
+                
+                <div class="reward-card">
+                    <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" alt="VIP Event" class="reward-image">
+                    <div class="reward-content">
+                        <h3 class="reward-title">VIP Tasting Event</h3>
+                        <div class="reward-points">2,000 Points</div>
+                        <p>Exclusive invitation to product tasting event</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Referral Program -->
+    <section class="referral-section">
+        <div class="container">
+            <div class="referral-card">
+                <h2 class="section-title" style="margin-bottom: 20px;">Refer & Earn</h2>
+                <p>Refer a business or friend to Arijeem Enterprises and earn ₦5,000 credit for each successful referral.</p>
+                
+                <div class="referral-code" id="referralCode">ARIJEEM-REF-2024</div>
+                
+                <p style="margin-bottom: 30px;"><strong>How it works:</strong> Share your code. When they place their first order over ₦50,000, you both get ₦5,000 credit!</p>
+                
+                <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                    <button onclick="copyReferralCode()" class="promo-cta" style="max-width: 200px;">
+                        <i class="fas fa-copy"></i> Copy Code
+                    </button>
+                    <button onclick="shareReferral()" class="promo-cta" style="max-width: 200px; background: var(--primary);">
+                        <i class="fas fa-share-alt"></i> Share
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>Arijeem Enterprises</h3>
+                    <p>Rewarding our loyal customers with exclusive promotions, discounts, and special offers.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="order.html">Place Order</a></li>
+                       <li><a href="teams.html"></i>Meet our Team</a></li>
+                    <li><a href="promo-loyalty.html"></i>Explore our Loyalty Programs</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Promotion Info</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-calendar"></i> Promotions updated monthly</li>
+                        <li><i class="fas fa-gift"></i> New customer offers</li>
+                        <li><i class="fas fa-medal"></i> Loyalty program details</li>
+                        <li><i class="fas fa-question-circle"></i> Terms & conditions apply</li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact Promotions</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-phone"></i> +234 803 123 4567</li>
+                        <li><i class="fas fa-envelope"></i> promotions@arijeementerprises.com</li>
+                        <li><i class="fas fa-clock"></i> Mon-Fri: 9am-5pm</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Lagos, Nigeria</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2024 Arijeem Multipurpose Enterprises. All rights reserved. | Promotions subject to terms and conditions</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile Menu Toggle
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            document.getElementById('navLinks').classList.toggle('active');
+        });
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const navLinks = document.getElementById('navLinks');
+            const menuBtn = document.getElementById('mobileMenuBtn');
+            
+            if (!navLinks.contains(event.target) && !menuBtn.contains(event.target)) {
+                navLinks.classList.remove('active');
+            }
+        });
+        
+        // Add active class to current page link
+        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            const linkPage = link.getAttribute('href');
+            if (linkPage === currentPage) {
+                link.style.background = 'rgba(255,255,255,0.2)';
+                link.style.fontWeight = '600';
+            }
+        });
+        
+        // Copy Referral Code
+        function copyReferralCode() {
+            const referralCode = document.getElementById('referralCode').textContent;
+            navigator.clipboard.writeText(referralCode).then(() => {
+                alert('Referral code copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+        
+        // Share Referral
+        function shareReferral() {
+            const referralCode = document.getElementById('referralCode').textContent;
+            const shareText = `Get ₦5,000 credit on your first order from Arijeem Enterprises! Use my referral code: ${referralCode}. Visit: arijeementerprises.com`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Arijeem Enterprises Referral',
+                    text: shareText,
+                    url: 'https://arijeementerprises.com'
+                });
+            } else {
+                // Fallback for browsers that don't support Web Share API
+                const tempInput = document.createElement('textarea');
+                tempInput.value = shareText;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempInput);
+                alert('Referral message copied to clipboard! Share it with your friends.');
+            }
+        }
+        
+        // Animate points display
+        function animatePoints() {
+            const pointsElement = document.getElementById('pointsDisplay');
+            const progressBar = document.getElementById('pointsProgress');
+            let points = parseInt(pointsElement.textContent.replace(/,/g, ''));
+            let targetPoints = 1250;
+            let currentPoints = 0;
+            let increment = targetPoints / 50;
+            
+            const timer = setInterval(() => {
+                currentPoints += increment;
+                if (currentPoints >= targetPoints) {
+                    currentPoints = targetPoints;
+                    clearInterval(timer);
+                }
+                
+                pointsElement.textContent = Math.round(currentPoints).toLocaleString();
+                const progress = (currentPoints / 5000) * 100; // Silver tier at 5000 points
+                progressBar.style.width = `${Math.min(progress, 100)}%`;
+            }, 30);
+        }
+        
+        // Initialize animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate points on page load
+            setTimeout(animatePoints, 500);
+            
+            // Add hover effects to promo cards
+            const promoCards = document.querySelectorAll('.promo-card');
+            promoCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-10px)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+            
+            // Add click-to-copy for promo codes
+            const promoCodes = document.querySelectorAll('.promo-code');
+            promoCodes.forEach(code => {
+                code.style.cursor = 'pointer';
+                code.title = 'Click to copy code';
+                code.addEventListener('click', function() {
+                    const codeText = this.textContent.replace('CODE: ', '');
+                    navigator.clipboard.writeText(codeText).then(() => {
+                        const originalText = this.textContent;
+                        this.textContent = 'Copied!';
+                        this.style.background = 'var(--success)';
+                        
+                        setTimeout(() => {
+                            this.textContent = originalText;
+                            this.style.background = 'var(--primary)';
+                        }, 2000);
+                    });
+                });
+            });
+            
+            // Simulate points update when clicking earn points button
+            document.querySelector('a[href="order.html"]').addEventListener('click', function(e) {
+                if (this.textContent.includes('Earn More Points')) {
+                    e.preventDefault();
+                    const currentPoints = parseInt(document.getElementById('pointsDisplay').textContent.replace(/,/g, ''));
+                    const newPoints = currentPoints + 500;
+                    document.getElementById('pointsDisplay').textContent = newPoints.toLocaleString();
+                    
+                    const progress = (newPoints / 5000) * 100;
+                    document.getElementById('pointsProgress').style.width = `${Math.min(progress, 100)}%`;
+                    
+                    alert('Points updated! Visit the order page to place an order and earn more points.');
+                    setTimeout(() => {
+                        window.location.href = 'order.html';
+                    }, 1500);
+                }
+            });
+        });
+        
+        // Add CSS for animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+                100% { transform: scale(1); }
+            }
+            
+            .promo-card:hover .promo-badge {
+                animation: pulse 1s infinite;
+            }
+            
+            .tier-card.featured {
+                animation: pulse 2s infinite;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

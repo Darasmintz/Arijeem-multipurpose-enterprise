@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Arijeem Enterprises</title>
+    <link rel="icon" type="image/x-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Pepsi_2023.svg/640px-Pepsi_2023.svg.png">
+    <style>
+        /* Shared navigation + animations (matches teams.html nav + order.html animations) */
+
+:root{
+  --primary:#004B93; --secondary:#FF0000; --accent:#FFD700;
+  --light:#f8f9fa; --dark:#212529; --success:#28a745;
+  --pepsi-blue:#004B93; --pepsi-red:#FF0000;
+}
+
+/* Header & nav */
+.header{
+  background: linear-gradient(135deg,var(--primary) 0%,#002954 100%);
+  color:#fff;padding:1rem 0;position:fixed;width:100%;top:0;z-index:1000;
+  box-shadow:0 4px 20px rgba(0,0,0,0.1);
+}
+.container{max-width:1200px;margin:0 auto;padding:0 20px;}
+.nav-container{display:flex;justify-content:space-between;align-items:center;}
+.logo-container{display:flex;align-items:center;gap:15px;}
+.logo{height:45px;width:45px;background:#fff;border-radius:50%;padding:5px;box-shadow:0 0 10px rgba(255,255,255,0.3);transition:transform .3s;}
+.logo:hover{transform:scale(1.05);}
+.company-name{font-size:1.5rem;font-weight:700;color:#fff;}
+.mobile-menu-btn{display:none;background:none;border:none;color:white;font-size:1.8rem;cursor:pointer;}
+
+/* Nav links */
+.nav-links{display:flex;gap:2rem;list-style:none;}
+.nav-links a{color:white;text-decoration:none;font-weight:500;padding:.5rem 1rem;border-radius:4px;transition:all .3s;display:flex;align-items:center;gap:8px;}
+.nav-links a i{font-size:1.1rem;}
+.nav-links a:hover{background:rgba(255,255,255,0.12);transform:translateY(-2px);}
+
+/* Responsive nav behavior */
+@media(max-width:768px){
+  .mobile-menu-btn{display:block;}
+  .nav-links{display:none;position:absolute;top:100%;left:0;width:100%;background:var(--primary);flex-direction:column;padding:1rem;box-shadow:0 10px 20px rgba(0,0,0,0.1);}
+  .nav-links.active{display:flex;}
+}
+
+/* Consistent small animations & toasts used across pages */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeInDown{from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:none}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+@keyframes slideInLeft{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:none}}
+@keyframes slideInRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+@keyframes slideInDown{from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:none}}
+@keyframes slideInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+@keyframes bounce{0%,20%,50%,80%,100%{transform:translateY(0)}40%{transform:translateY(-10px)}60%{transform:translateY(-5px)}}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
+
+/* Toast */
+.toast{position:fixed;top:100px;right:20px;padding:12px 18px;border-radius:10px;color:#fff;z-index:3000;animation:slideInRight .3s}
+.toast.success{background:linear-gradient(135deg,var(--success),#1e7e34)}
+.toast.error{background:linear-gradient(135deg,#dc3545,#bd2130)}
+.toast.info{background:linear-gradient(135deg,var(--pepsi-blue),#003366)}
+
+/* Small helper classes used by nav scripts */
+.nav-active{transform:translateY(-3px);}
+
+/* ensure consistent focus/hover for nav buttons */
+.nav-links a:focus{outline:2px solid rgba(255,255,255,0.12);outline-offset:2px}
+
+/* Contact Hero */
+.contact-hero {
+    background: linear-gradient(rgba(0,43,84,0.85), rgba(0,43,84,0.9)), url('https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    padding: 140px 0 60px;
+    text-align: center;
+    margin-top: 73px;
+}
+
+.contact-hero h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.contact-hero p {
+    font-size: 1.2rem;
+    max-width: 800px;
+    margin: 0 auto 2rem;
+    opacity: 0.95;
+}
+
+/* Contact Container */
+.contact-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+    padding: 60px 0;
+}
+
+/* Contact Form */
+.contact-form-section {
+    background: white;
+    border-radius: 15px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.section-title {
+    font-size: 2rem;
+    color: var(--primary);
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--primary);
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.form-label.required::after {
+    content: " *";
+    color: var(--secondary);
+}
+
+.form-input, .form-select, .form-textarea {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0,75,147,0.1);
+}
+
+.form-textarea {
+    height: 150px;
+    resize: vertical;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(45deg, var(--secondary), #ff3333);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.submit-btn:hover {
+    background: linear-gradient(45deg, #ff3333, var(--secondary));
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(255,0,0,0.2);
+}
+
+/* Contact Info */
+.contact-info {
+    background: white;
+    border-radius: 15px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    height: fit-content;
+}
+
+.info-card {
+    margin-bottom: 30px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.info-card:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.info-title {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    color: var(--primary);
+}
+
+.info-icon {
+    font-size: 1.5rem;
+    width: 50px;
+    height: 50px;
+    background: #f0f7ff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+}
+
+.contact-details {
+    list-style: none;
+}
+
+.contact-details li {
+    padding: 12px 0;
+    border-bottom: 1px solid #f8f9fa;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.contact-details li i {
+    color: var(--primary);
+    width: 20px;
+}
+
+/* Business Hours */
+.hours-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.hours-table tr {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.hours-table td {
+    padding: 12px 0;
+}
+
+.hours-table td:first-child {
+    font-weight: 600;
+    color: var(--primary);
+}
+
+/* Emergency Contact */
+.emergency-contact {
+    background: linear-gradient(135deg, var(--primary) 0%, #002954 100%);
+    color: white;
+    padding: 25px;
+    border-radius: 10px;
+    margin-top: 30px;
+    text-align: center;
+}
+
+.emergency-icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    color: var(--accent);
+}
+
+.emergency-number {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 15px 0;
+    color: white;
+}
+
+/* Map Section */
+.map-section {
+    padding: 60px 0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.map-container {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    height: 400px;
+    background: #e0e0e0;
+    position: relative;
+}
+
+.map-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.map-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+/* Departments Grid */
+.departments-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.department-card {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
+    border-top: 4px solid var(--primary);
+}
+
+.department-card:hover {
+    transform: translateY(-5px);
+}
+
+.department-icon {
+    font-size: 2.5rem;
+    color: var(--primary);
+    margin-bottom: 20px;
+}
+
+/* Footer */
+.footer {
+    background: var(--primary);
+    color: white;
+    padding: 60px 0 30px;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+.footer-section h3 {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    color: var(--accent);
+}
+
+.footer-links {
+    list-style: none;
+}
+
+.footer-links a {
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+    display: block;
+    margin-bottom: 10px;
+    transition: color 0.3s;
+}
+
+.footer-links a:hover {
+    color: var(--accent);
+}
+
+.copyright {
+    text-align: center;
+    padding-top: 30px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.7);
+    font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .contact-container {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+}
+
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: block;
+    }
+    
+    .nav-links {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: var(--primary);
+        flex-direction: column;
+        padding: 1rem;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .nav-links.active {
+        display: flex;
+    }
+    
+    .contact-hero h1 {
+        font-size: 2.2rem;
+    }
+    
+    .contact-form-section, .contact-info {
+        padding: 25px;
+    }
+    
+    .emergency-number {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .contact-hero h1 {
+        font-size: 1.8rem;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+    }
+    
+    .departments-grid {
+        grid-template-columns: 1fr;
+    }
+}
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header & Navigation -->
+    <header class="header">
+        <div class="container">
+            <nav class="nav-container">
+                <div class="logo-container">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Pepsi_2023.svg/640px-Pepsi_2023.svg.png" alt="Arijeem Logo" class="logo">
+                    <span class="company-name">Arijeem Enterprises</span>
+                </div>
+                
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="services.html"><i class="fas fa-concierge-bell"></i> Services</a></li>
+                    <li><a href="products.html"><i class="fas fa-wine-bottle"></i> Products</a></li>
+                    <li><a href="order.html"><i class="fas fa-shopping-cart"></i> Order</a></li>
+                    <li><a href="contact.html"><i class="fas fa-phone"></i> Contact</a></li>
+                    <li><a href="teams.html"><i class="fas fa-users"></i> Teams</a></li>
+                    <li><a href="promo-loyalty.html"><i class="fas fa-gift"></i>Loyalty</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Contact Hero -->
+    <section class="contact-hero">
+        <div class="container">
+            <h1>Get In Touch</h1>
+            <p>We're here to help with your beverage needs. Contact us for inquiries, orders, or support.</p>
+        </div>
+    </section>
+
+    <!-- Contact Container -->
+    <div class="container">
+        <div class="contact-container">
+            <!-- Contact Form -->
+            <div class="contact-form-section">
+                <h2 class="section-title">Send Us a Message</h2>
+                
+                <form id="contactForm">
+                    <div class="form-group">
+                        <label class="form-label required" for="name">Full Name</label>
+                        <input type="text" id="name" class="form-input" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label required" for="phone">Phone Number</label>
+                        <input type="tel" id="phone" class="form-input" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email Address</label>
+                        <input type="email" id="email" class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label required" for="subject">Subject</label>
+                        <select id="subject" class="form-select" required>
+                            <option value="">Select a subject</option>
+                            <option value="order">Order Inquiry</option>
+                            <option value="wholesale">Wholesale Account</option>
+                            <option value="delivery">Delivery Question</option>
+                            <option value="product">Product Information</option>
+                            <option value="payment">Payment Issue</option>
+                            <option value="complaint">Complaint</option>
+                            <option value="feedback">Feedback</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label required" for="message">Message</label>
+                        <textarea id="message" class="form-textarea" required placeholder="How can we help you?"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-paper-plane"></i> Send Message
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Contact Info -->
+            <div class="contact-info">
+                <!-- Contact Details -->
+                <div class="info-card">
+                    <div class="info-title">
+                        <div class="info-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <h3>Contact Details</h3>
+                    </div>
+                    
+                    <ul class="contact-details">
+                        <li>
+                            <i class="fas fa-phone"></i>
+                            <div>
+                                <strong>Sales & Orders:</strong><br>
+                                +234 803 123 4567
+                            </div>
+                        </li>
+                        <li>
+                            <i class="fas fa-phone"></i>
+                            <div>
+                                <strong>Customer Support:</strong><br>
+                                +234 902 876 5432
+                            </div>
+                        </li>
+                        <li>
+                            <i class="fas fa-envelope"></i>
+                            <div>
+                                <strong>Email:</strong><br>
+                                info@arijeementerprises.com
+                            </div>
+                        </li>
+                        <li>
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div>
+                                <strong>Office Address:</strong><br>
+                                Lagos, Nigeria
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Business Hours -->
+                <div class="info-card">
+                    <div class="info-title">
+                        <div class="info-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <h3>Business Hours</h3>
+                    </div>
+                    
+                    <table class="hours-table">
+                        <tr>
+                            <td>Monday - Friday</td>
+                            <td>8:00 AM - 6:00 PM</td>
+                        </tr>
+                        <tr>
+                            <td>Saturday</td>
+                            <td>9:00 AM - 4:00 PM</td>
+                        </tr>
+                        <tr>
+                            <td>Sunday</td>
+                            <td>10:00 AM - 2:00 PM</td>
+                        </tr>
+                        <tr>
+                            <td>Emergency Orders</td>
+                            <td>24/7 Available</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <!-- Emergency Contact -->
+                <div class="emergency-contact">
+                    <div class="emergency-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h3>Urgent Delivery Needed?</h3>
+                    <p>For emergency orders and urgent deliveries</p>
+                    <div class="emergency-number">+234 803 999 8888</div>
+                    <p>Available 24 hours, 7 days a week</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Departments -->
+    <section class="container">
+        <h2 class="section-title" style="text-align: center; margin-top: 40px;">Contact Departments</h2>
+        
+        <div class="departments-grid">
+            <div class="department-card">
+                <div class="department-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <h3>Sales Department</h3>
+                <p>For new orders, quotations, and product inquiries</p>
+                <div style="margin-top: 15px; color: var(--primary); font-weight: 600;">
+                    sales@arijeementerprises.com
+                </div>
+            </div>
+            
+            <div class="department-card">
+                <div class="department-icon">
+                    <i class="fas fa-truck"></i>
+                </div>
+                <h3>Delivery & Logistics</h3>
+                <p>Delivery scheduling, tracking, and logistics</p>
+                <div style="margin-top: 15px; color: var(--primary); font-weight: 600;">
+                    logistics@arijeementerprises.com
+                </div>
+            </div>
+            
+            <div class="department-card">
+                <div class="department-icon">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                </div>
+                <h3>Accounts & Billing</h3>
+                <p>Invoices, payments, and account inquiries</p>
+                <div style="margin-top: 15px; color: var(--primary); font-weight: 600;">
+                    accounts@arijeementerprises.com
+                </div>
+            </div>
+            
+            <div class="department-card">
+                <div class="department-icon">
+                    <i class="fas fa-hands-helping"></i>
+                </div>
+                <h3>Customer Support</h3>
+                <p>Complaints, feedback, and general support</p>
+                <div style="margin-top: 15px; color: var(--primary); font-weight: 600;">
+                    support@arijeementerprises.com
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Map Section -->
+    <section class="map-section">
+        <div class="container">
+            <h2 class="section-title" style="text-align: center;">Our Location</h2>
+            
+            <div class="map-container">
+                <div class="map-placeholder">
+                    <div class="map-icon">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <h3 style="margin-bottom: 10px;">Lagos, Nigeria</h3>
+                    <p>We serve customers across major cities in Nigeria</p>
+                    <p style="margin-top: 20px; font-size: 0.9rem; opacity: 0.8;">
+                        Contact us for specific delivery locations and service areas
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>Arijeem Enterprises</h3>
+                    <p>Your trusted partner for beverage distribution. Quality products, reliable service, and excellent customer support.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="order.html">Place Order</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-phone"></i> +234 803 123 4567</li>
+                        <li><i class="fas fa-phone"></i> +234 902 876 5432</li>
+                        <li><i class="fas fa-envelope"></i> info@arijeementerprises.com</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Lagos, Nigeria</li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Support Hours</h3>
+                    <ul class="footer-links">
+                        <li>Monday - Friday: 8am - 6pm</li>
+                        <li>Saturday: 9am - 4pm</li>
+                        <li>Sunday: 10am - 2pm</li>
+                        <li>Emergency: 24/7</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2024 Arijeem Multipurpose Enterprises. All rights reserved. | Professional beverage distribution</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile Menu Toggle
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            document.getElementById('navLinks').classList.toggle('active');
+        });
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const navLinks = document.getElementById('navLinks');
+            const menuBtn = document.getElementById('mobileMenuBtn');
+            
+            if (!navLinks.contains(event.target) && !menuBtn.contains(event.target)) {
+                navLinks.classList.remove('active');
+            }
+        });
+        
+        // Add active class to current page link
+        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            const linkPage = link.getAttribute('href');
+            if (linkPage === currentPage) {
+                link.style.background = 'rgba(255,255,255,0.2)';
+                link.style.fontWeight = '600';
+            }
+        });
+        
+        // Contact Form Submission
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = {
+                name: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                subject: document.getElementById('subject').value,
+                message: document.getElementById('message').value,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Validate subject
+            if (!formData.subject) {
+                alert('Please select a subject for your message');
+                return;
+            }
+            
+            // Create message summary
+            let messageSummary = `MESSAGE SENT SUCCESSFULLY\n`;
+            messageSummary += `=======================\n`;
+            messageSummary += `From: ${formData.name}\n`;
+            messageSummary += `Phone: ${formData.phone}\n`;
+            messageSummary += `Subject: ${formData.subject}\n\n`;
+            messageSummary += `Message:\n${formData.message}\n\n`;
+            messageSummary += `Thank you for contacting Arijeem Enterprises!\n`;
+            messageSummary += `We will respond to your inquiry within 2 business hours.`;
+            
+            // Show confirmation
+            alert(messageSummary);
+            
+            // Reset form
+            this.reset();
+            
+            // Show success message
+            const successMsg = document.createElement('div');
+            successMsg.textContent = 'Message sent successfully! We will contact you soon.';
+            successMsg.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                background: #28a745;
+                color: white;
+                padding: 15px 25px;
+                border-radius: 8px;
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+            `;
+            document.body.appendChild(successMsg);
+            
+            setTimeout(() => {
+                successMsg.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => successMsg.remove(), 300);
+            }, 5000);
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        
+        // Add CSS for animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Auto-expand textarea
+        document.getElementById('message').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+        
+        // Phone number formatting
+        document.getElementById('phone').addEventListener('input', function() {
+            let value = this.value.replace(/\D/g, '');
+            
+            if (value.length > 3 && value.length <= 6) {
+                value = value.replace(/(\d{3})(\d+)/, '$1-$2');
+            } else if (value.length > 6 && value.length <= 10) {
+                value = value.replace(/(\d{3})(\d{3})(\d+)/, '$1-$2-$3');
+            } else if (value.length > 10) {
+                value = value.replace(/(\d{3})(\d{3})(\d{4})(\d+)/, '$1-$2-$3-$4');
+            }
+            
+            this.value = value;
+        });
+        
+        // Quick contact buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click-to-call functionality
+            const phoneNumbers = document.querySelectorAll('.contact-details li');
+            phoneNumbers.forEach(li => {
+                li.style.cursor = 'pointer';
+                li.addEventListener('click', function() {
+                    const text = this.textContent;
+                    const phoneMatch = text.match(/\+\d{3}\s\d{3}\s\d{4,}/);
+                    if (phoneMatch) {
+                        const phone = phoneMatch[0].replace(/\s/g, '');
+                        if (confirm(`Call ${phone}?`)) {
+                            window.location.href = `tel:${phone}`;
+                        }
+                    }
+                });
+            });
+            
+            // Add copy email functionality
+            const emailElements = document.querySelectorAll('.department-card div[style*="color: var(--primary)"]');
+            emailElements.forEach(element => {
+                element.style.cursor = 'pointer';
+                element.title = 'Click to copy email';
+                element.addEventListener('click', function() {
+                    const email = this.textContent.trim();
+                    navigator.clipboard.writeText(email).then(() => {
+                        const originalText = this.textContent;
+                        this.textContent = 'Copied!';
+                        this.style.color = 'var(--success)';
+                        
+                        setTimeout(() => {
+                            this.textContent = originalText;
+                            this.style.color = 'var(--primary)';
+                        }, 2000);
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
