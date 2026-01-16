@@ -2217,8 +2217,8 @@
             submitOrderBtn.disabled = false;
         }
 
-        // Submit Order
-        orderForm.addEventListener('submit', function(e) {
+        // FORM SUBMISSION WITH FORMSPREE INTEGRATION - FIXED VERSION
+        orderForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
             if (cart.length === 0) {
@@ -2226,55 +2226,188 @@
                 return;
             }
             
-            const formData = {
-                customerName: document.getElementById('customerName').value,
-                customerPhone: document.getElementById('customerPhone').value,
-                customerEmail: document.getElementById('customerEmail').value,
-                deliveryAddress: document.getElementById('deliveryAddress').value,
-                deliveryDate: document.getElementById('deliveryDate').value,
-                orderNotes: document.getElementById('orderNotes').value,
-                orderType: isWholesaleMode ? 'wholesale' : 'retail',
-                cart: cart,
-                subtotal: document.getElementById('subtotal').textContent,
-                total: document.getElementById('totalAmount').textContent,
-                timestamp: new Date().toISOString()
-            };
+            // Disable submit button to prevent double submission
+            const submitBtn = document.getElementById('submitOrder');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending Order...';
+            submitBtn.disabled = true;
             
-            let orderSummary = `ORDER CONFIRMATION\n`;
-            orderSummary += `================\n`;
-            orderSummary += `Customer: ${formData.customerName}\n`;
-            orderSummary += `Phone: ${formData.customerPhone}\n`;
-            orderSummary += `Delivery Address: ${formData.deliveryAddress}\n`;
-            orderSummary += `Order Type: ${formData.orderType.toUpperCase()}\n`;
-            orderSummary += `Date: ${new Date(formData.deliveryDate).toLocaleDateString()}\n\n`;
-            orderSummary += `ITEMS:\n`;
-            
-            cart.forEach(item => {
-                const product = findProduct(item.id);
-                const priceType = priceOverrides[item.id] ? 'Custom' : 
-                                 (item.quantity >= item.minWholesale ? 'Wholesale' : 'Retail');
-                orderSummary += `- ${item.name}: ${item.quantity} × ₦${item.unitPrice} (${priceType}) = ₦${item.unitPrice * item.quantity}\n`;
-            });
-            
-            orderSummary += `\nSubtotal: ${formData.subtotal}\n`;
-            orderSummary += `Delivery: ${document.getElementById('deliveryFee').textContent}\n`;
-            orderSummary += `TOTAL: ${formData.total}\n\n`;
-            orderSummary += `NOTES: ${formData.orderNotes || 'None'}\n\n`;
-            orderSummary += `Thank you for your order! We'll contact you shortly to confirm delivery.`;
-            
-            alert(orderSummary);
-            
-            orderForm.reset();
-            cart = [];
-            saveCart();
-            updateCart();
-            
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            document.getElementById('deliveryDate').valueAsDate = tomorrow;
-            
-            showToast('Order submitted successfully! We will contact you shortly.', 'success');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            try {
+                // Build COMPLETE order summary for email
+                let orderSummary = `<h2 style="color: #004B93; border-bottom: 3px solid #FF0000; padding-bottom: 10px;">📦 NEW ORDER - ARIJEEM ENTERPRISES</h2>`;
+                
+                // Customer Details Section
+                orderSummary += `<div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 5px solid #004B93;">`;
+                orderSummary += `<h3 style="color: #004B93; margin-top: 0;">👤 CUSTOMER INFORMATION</h3>`;
+                orderSummary += `<p><strong>Full Name:</strong> ${document.getElementById('customerName').value}</p>`;
+                orderSummary += `<p><strong>Phone Number:</strong> ${document.getElementById('customerPhone').value}</p>`;
+                orderSummary += `<p><strong>Email Address:</strong> ${document.getElementById('customerEmail').value || 'Not provided'}</p>`;
+                orderSummary += `<p><strong>Delivery Address:</strong> ${document.getElementById('deliveryAddress').value}</p>`;
+                
+                const deliveryDate = document.getElementById('deliveryDate').value;
+                orderSummary += `<p><strong>Preferred Delivery Date:</strong> ${deliveryDate ? new Date(deliveryDate).toLocaleDateString('en-NG') : 'ASAP'}</p>`;
+                
+                orderSummary += `<p><strong>Order Type:</strong> ${isWholesaleMode ? 'WHOLESALE (50+ units)' : 'RETAIL (1-49 units)'}</p>`;
+                
+                const deliveryMethod = document.querySelector('input[name="deliveryOption"]:checked').value;
+                orderSummary += `<p><strong>Delivery Method:</strong> ${deliveryMethod === 'pickup' ? 'PICKUP (Free)' : 'DELIVERY (₦100 fee)'}</p>`;
+                orderSummary += `</div>`;
+                
+                // Order Items Section
+                orderSummary += `<div style="margin: 30px 0;">`;
+                orderSummary += `<h3 style="color: #004B93; border-bottom: 2px solid #FF0000; padding-bottom: 8px;">🛒 ORDER ITEMS</h3>`;
+                orderSummary += `<table style="width: 100%; border-collapse: collapse; margin-top: 15px;">`;
+                orderSummary += `<thead><tr style="background: #004B93; color: white;">`;
+                orderSummary += `<th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Product</th>`;
+                orderSummary += `<th style="padding: 12px; text-align: center; border: 1px solid #ddd;">Type</th>`;
+                orderSummary += `<th style="padding: 12px; text-align: center; border: 1px solid #ddd;">Quantity</th>`;
+                orderSummary += `<th style="padding: 12px; text-align: right; border: 1px solid #ddd;">Unit Price</th>`;
+                orderSummary += `<th style="padding: 12px; text-align: right; border: 1px solid #ddd;">Total</th>`;
+                orderSummary += `<th style="padding: 12px; text-align: center; border: 1px solid #ddd;">Price Type</th>`;
+                orderSummary += `</tr></thead>`;
+                orderSummary += `<tbody>`;
+                
+                let subtotal = 0;
+                cart.forEach(item => {
+                    const product = findProduct(item.id);
+                    const itemTotal = item.unitPrice * item.quantity;
+                    subtotal += itemTotal;
+                    
+                    const priceType = priceOverrides[item.id] ? 'CUSTOM PRICE' : 
+                                   (item.quantity >= item.minWholesale ? 'WHOLESALE' : 'RETAIL');
+                    const priceTypeColor = priceOverrides[item.id] ? '#ffc107' : 
+                                         (item.quantity >= item.minWholesale ? '#FF0000' : '#28a745');
+                    
+                    orderSummary += `<tr style="border-bottom: 1px solid #eee;">`;
+                    orderSummary += `<td style="padding: 12px; border: 1px solid #ddd;"><strong>${item.name}</strong></td>`;
+                    orderSummary += `<td style="padding: 12px; text-align: center; border: 1px solid #ddd;">${product.type}</td>`;
+                    orderSummary += `<td style="padding: 12px; text-align: center; border: 1px solid #ddd;">${item.quantity} units</td>`;
+                    orderSummary += `<td style="padding: 12px; text-align: right; border: 1px solid #ddd;">₦${item.unitPrice.toLocaleString()}</td>`;
+                    orderSummary += `<td style="padding: 12px; text-align: right; border: 1px solid #ddd; font-weight: bold;">₦${itemTotal.toLocaleString()}</td>`;
+                    orderSummary += `<td style="padding: 12px; text-align: center; border: 1px solid #ddd; color: ${priceTypeColor}; font-weight: bold;">${priceType}</td>`;
+                    orderSummary += `</tr>`;
+                });
+                
+                orderSummary += `</tbody>`;
+                orderSummary += `</table>`;
+                orderSummary += `</div>`;
+                
+                // Price Summary Section
+                const deliveryFee = deliveryMethod === 'pickup' ? 0 : 100;
+                const total = subtotal + deliveryFee;
+                
+                orderSummary += `<div style="background: linear-gradient(135deg, #004B93, #003366); color: white; padding: 25px; border-radius: 10px; margin: 30px 0;">`;
+                orderSummary += `<h3 style="margin-top: 0; color: white; border-bottom: 2px solid rgba(255,255,255,0.3); padding-bottom: 10px;">💰 ORDER SUMMARY</h3>`;
+                orderSummary += `<div style="display: flex; justify-content: space-between; margin: 15px 0;">`;
+                orderSummary += `<span>Subtotal:</span><span><strong>₦${subtotal.toLocaleString()}</strong></span>`;
+                orderSummary += `</div>`;
+                orderSummary += `<div style="display: flex; justify-content: space-between; margin: 15px 0;">`;
+                orderSummary += `<span>Delivery Fee:</span><span><strong>${deliveryFee === 0 ? 'FREE' : '₦' + deliveryFee.toLocaleString()}</strong></span>`;
+                orderSummary += `</div>`;
+                orderSummary += `<div style="display: flex; justify-content: space-between; margin: 15px 0; font-size: 1.4rem; border-top: 2px solid rgba(255,255,255,0.3); padding-top: 15px;">`;
+                orderSummary += `<span><strong>TOTAL AMOUNT:</strong></span><span><strong>₦${total.toLocaleString()}</strong></span>`;
+                orderSummary += `</div>`;
+                orderSummary += `</div>`;
+                
+                // Additional Notes
+                const orderNotes = document.getElementById('orderNotes').value;
+                if (orderNotes) {
+                    orderSummary += `<div style="background: #fff3cd; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 5px solid #ffc107;">`;
+                    orderSummary += `<h3 style="color: #856404; margin-top: 0;">📝 ADDITIONAL NOTES</h3>`;
+                    orderSummary += `<p>${orderNotes}</p>`;
+                    orderSummary += `</div>`;
+                }
+                
+                // Footer with timestamp
+                orderSummary += `<div style="text-align: center; margin-top: 30px; color: #666; font-size: 0.9rem; border-top: 1px solid #ddd; padding-top: 15px;">`;
+                orderSummary += `<p><strong>Order Submitted:</strong> ${new Date().toLocaleString('en-NG')}</p>`;
+                orderSummary += `<p><em>This order was submitted through the Arijeem Enterprises online ordering system</em></p>`;
+                orderSummary += `</div>`;
+                
+                // Prepare data for Formspree
+                const formData = new FormData();
+                formData.append('_replyto', document.getElementById('customerEmail').value || 'no-email@arijeem.com');
+                formData.append('_subject', `📦 NEW ORDER - ${document.getElementById('customerName').value} - ₦${total.toLocaleString()}`);
+                formData.append('message', orderSummary);
+                formData.append('customerName', document.getElementById('customerName').value);
+                formData.append('customerPhone', document.getElementById('customerPhone').value);
+                formData.append('customerEmail', document.getElementById('customerEmail').value || 'Not provided');
+                formData.append('deliveryAddress', document.getElementById('deliveryAddress').value);
+                formData.append('deliveryDate', document.getElementById('deliveryDate').value || 'ASAP');
+                formData.append('orderType', isWholesaleMode ? 'wholesale' : 'retail');
+                formData.append('deliveryMethod', deliveryMethod === 'pickup' ? 'Pickup' : 'Delivery');
+                formData.append('subtotal', `₦${subtotal.toLocaleString()}`);
+                formData.append('deliveryFee', deliveryFee === 0 ? 'FREE' : `₦${deliveryFee}`);
+                formData.append('totalAmount', `₦${total.toLocaleString()}`);
+                formData.append('itemCount', cart.reduce((sum, item) => sum + item.quantity, 0));
+                formData.append('uniqueProducts', cart.length);
+                
+                // ⭐⭐ YOUR FORMSPREE ENDPOINT IS HERE ⭐⭐
+                const formspreeEndpoint = 'https://formspree.io/f/maqqyqpd';
+                
+                // Send to Formspree
+                const response = await fetch(formspreeEndpoint, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    // Clear form and cart
+                    orderForm.reset();
+                    cart = [];
+                    saveCart();
+                    updateCart();
+                    
+                    // Reset delivery date to tomorrow
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    document.getElementById('deliveryDate').valueAsDate = tomorrow;
+                    
+                    showToast('✅ Order sent successfully! Check your email for confirmation.', 'success');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    
+                    // Also show confirmation to customer
+                    alert(`📦 ORDER CONFIRMED!\n\nThank you ${document.getElementById('customerName').value}!\n\nORDER DETAILS:\n• Total Amount: ₦${total.toLocaleString()}\n• Items: ${cart.reduce((sum, item) => sum + item.quantity, 0)} units\n• Delivery: ${deliveryMethod === 'pickup' ? 'Pickup' : 'Delivery to address'}\n\nWe will contact you at ${document.getElementById('customerPhone').value} to confirm delivery.\n\n✅ Order has been sent to Arijeem Enterprises!`);
+                    
+                } else {
+                    throw new Error('Formspree submission failed');
+                }
+                
+            } catch (error) {
+                console.error('Order submission error:', error);
+                showToast('❌ Failed to send order. Please try again or call +234 803 123 4567', 'error');
+                
+                // Fallback: Show order details in alert (temporary solution)
+                let fallbackSummary = `ORDER DETAILS (Please Call to Complete):\n\n`;
+                fallbackSummary += `Customer: ${document.getElementById('customerName').value}\n`;
+                fallbackSummary += `Phone: ${document.getElementById('customerPhone').value}\n`;
+                fallbackSummary += `Address: ${document.getElementById('deliveryAddress').value}\n\n`;
+                fallbackSummary += `ITEMS:\n`;
+                
+                cart.forEach(item => {
+                    const product = findProduct(item.id);
+                    fallbackSummary += `• ${item.name}: ${item.quantity} × ₦${item.unitPrice} = ₦${item.unitPrice * item.quantity}\n`;
+                });
+                
+                const deliveryMethod = document.querySelector('input[name="deliveryOption"]:checked').value;
+                const deliveryFee = deliveryMethod === 'pickup' ? 0 : 100;
+                const subtotal = cart.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
+                const total = subtotal + deliveryFee;
+                
+                fallbackSummary += `\nSubtotal: ₦${subtotal.toLocaleString()}\n`;
+                fallbackSummary += `Delivery: ${deliveryFee === 0 ? 'FREE' : '₦' + deliveryFee}\n`;
+                fallbackSummary += `TOTAL: ₦${total.toLocaleString()}\n\n`;
+                fallbackSummary += `Please call +234 803 123 4567 to complete your order.`;
+                
+                alert(fallbackSummary);
+            } finally {
+                // Re-enable submit button
+                submitBtn.innerHTML = originalBtnText;
+                submitBtn.disabled = false;
+            }
         });
 
         // Initialize
