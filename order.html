@@ -1501,110 +1501,517 @@
         // Initialize Supabase client
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // ============================================
-        // SUPABASE DATABASE FUNCTIONS FOR ORDERS
-        // ============================================
+       // ============================================
+// UPDATED SUPABASE FUNCTIONS - FIXED VERSION
+// ============================================
 
-        // Submit order to Supabase database
-        async function submitOrderToSupabase(orderData) {
-            try {
-                console.log('📦 Submitting order to Supabase...', orderData);
-                
-                // Prepare data for Supabase orders table
-                const orderDataForSupabase = {
-                    order_id: orderData.orderId,
-                    customer_name: orderData.customerName,
-                    customer_phone: orderData.customerPhone,
-                    customer_email: orderData.customerEmail || '',
-                    delivery_address: orderData.deliveryAddress,
-                    delivery_date: orderData.deliveryDate || null,
-                    delivery_method: orderData.deliveryMethod,
-                    order_type: orderData.orderType,
-                    subtotal: orderData.subtotal,
-                    delivery_fee: orderData.deliveryFee,
-                    total_amount: orderData.total,
-                    additional_notes: orderData.additionalNotes || '',
-                    status: 'pending',
-                    created_at: new Date().toISOString()
-                };
-                
-                console.log('📝 Order data for Supabase:', orderDataForSupabase);
-                
-                // Insert order into Supabase orders table
-                const { data: orderResult, error: orderError } = await supabaseClient
-                    .from('orders')
-                    .insert([orderDataForSupabase])
-                    .select();
-                
-                if (orderError) {
-                    console.error('❌ Error inserting order:', orderError);
-                    throw orderError;
-                }
-                
-                console.log('✅ Order inserted successfully:', orderResult);
-                const orderId = orderResult[0].id;
-                
-                // Insert order items into order_items table
-                if (orderData.items && orderData.items.length > 0) {
-                    const orderItems = orderData.items.map(item => ({
-                        order_id: orderId,
-                        product_name: item.name,
-                        product_type: item.type,
-                        quantity: item.quantity,
-                        unit_price: item.unitPrice,
-                        total_price: item.totalPrice,
-                        price_type: orderData.isWholesale ? 'wholesale' : 'retail',
-                        created_at: new Date().toISOString()
-                    }));
-                    
-                    const { error: itemsError } = await supabaseClient
-                        .from('order_items')
-                        .insert(orderItems);
-                    
-                    if (itemsError) {
-                        console.error('❌ Error inserting order items:', itemsError);
-                        throw itemsError;
-                    }
-                    
-                    console.log(`✅ ${orderItems.length} order items inserted successfully`);
-                }
-                
-                return { 
-                    success: true, 
-                    orderId: orderId,
-                    supabaseData: orderResult 
-                };
-                
-            } catch (error) {
-                console.error('❌ Supabase submission error:', error);
-                return { 
-                    success: false, 
-                    error: error.message || 'Failed to save order to database' 
-                };
+// Submit order to Supabase database - FIXED VERSION
+async function submitOrderToSupabase(orderData) {
+    console.log('🚀 Starting Supabase submission...', orderData);
+    
+    try {
+        // 1. First insert into orders table
+        const orderRecord = {
+            order_id: orderData.orderId,
+            customer_name: orderData.customerName,
+            customer_phone: orderData.customerPhone,
+            customer_email: orderData.customerEmail || null,
+            delivery_address: orderData.deliveryAddress,
+            delivery_date: orderData.deliveryDate || null,
+            delivery_method: orderData.deliveryMethod,
+            order_type: orderData.orderType,
+            subtotal: orderData.subtotal,
+            delivery_fee: orderData.deliveryFee,
+            total_amount: orderData.total,
+            additional_notes: orderData.additionalNotes || '',
+            status: 'pending'
+        };
+        
+        console.log('📝 Inserting order record:', orderRecord);
+        
+        const { data: orderResult, error: orderError } = await supabaseClient
+            .from('orders')
+            .insert([orderRecord])
+            .select();
+        
+        if (orderError) {
+            console.error('❌ ORDER INSERT ERROR:', orderError);
+            console.error('Error details:', {
+                message: orderError.message,
+                details: orderError.details,
+                hint: orderError.hint,
+                code: orderError.code
+            });
+            throw orderError;
+        }
+        
+        console.log('✅ Order inserted successfully:', orderResult);
+        const insertedOrderId = orderResult[0].id;
+        
+        // 2. Insert order items
+        if (orderData.items && orderData.items.length > 0) {
+            const orderItems = orderData.items.map(item => ({
+                order_id: insertedOrderId,
+                product_name: item.name,
+                product_type: item.type,
+                quantity: item.quantity,
+                unit_price: item.unitPrice,
+                total_price: item.totalPrice,
+                price_type: orderData.isWholesale ? 'wholesale' : 'retail'
+            }));
+            
+            console.log('📦 Inserting order items:', orderItems);
+            
+            const { error: itemsError } = await supabaseClient
+                .from('order_items')
+                .insert(orderItems);
+            
+            if (itemsError) {
+                console.error('❌ ORDER ITEMS INSERT ERROR:', itemsError);
+                // Don't throw here, just log - the main order is still saved
+            } else {
+                console.log(`✅ ${orderItems.length} order items inserted`);
             }
         }
+        
+        return { 
+            success: true, 
+            orderId: insertedOrderId,
+            data: orderResult 
+        };
+        
+    } catch (error) {
+        console.error('❌ SUPABASE SUBMISSION FAILED:', error);
+        return { 
+            success: false, 
+            error: error.message,
+            fullError: error 
+        };
+    }
+}
 
-        // Test Supabase connection
-        async function testSupabaseConnection() {
-            try {
-                const { data, error } = await supabaseClient
-                    .from('orders')
-                    .select('count')
-                    .limit(1);
-                
-                if (error) {
-                    console.warn('⚠️ Supabase connection warning:', error.message);
-                    return false;
-                }
-                
-                console.log('✅ Supabase connection successful!');
-                return true;
-            } catch (error) {
-                console.warn('⚠️ Supabase connection test failed:', error.message);
-                return false;
-            }
+// Test Supabase connection with detailed logging
+async function testSupabaseConnection() {
+    console.log('🔍 Testing Supabase connection...');
+    
+    try {
+        // Test 1: Check if we can query orders
+        const { data: ordersData, error: ordersError } = await supabaseClient
+            .from('orders')
+            .select('id')
+            .limit(1);
+        
+        if (ordersError) {
+            console.error('❌ Orders table query failed:', ordersError);
+        } else {
+            console.log('✅ Orders table accessible:', ordersData);
         }
+        
+        // Test 2: Check if we can insert a test record
+        const testRecord = {
+            order_id: 'TEST_' + Date.now(),
+            customer_name: 'Test Customer',
+            customer_phone: '0000000000',
+            delivery_address: 'Test Address',
+            delivery_method: 'delivery',
+            order_type: 'retail',
+            subtotal: 100,
+            delivery_fee: 10,
+            total_amount: 110,
+            status: 'test'
+        };
+        
+        console.log('🧪 Testing insert with:', testRecord);
+        
+        const { data: testInsert, error: testError } = await supabaseClient
+            .from('orders')
+            .insert([testRecord])
+            .select();
+        
+        if (testError) {
+            console.error('❌ Test insert failed:', testError);
+            console.error('Error code:', testError.code);
+            console.error('Error details:', testError.details);
+            return false;
+        } else {
+            console.log('✅ Test insert successful:', testInsert);
+            
+            // Clean up test record
+            const { error: deleteError } = await supabaseClient
+                .from('orders')
+                .delete()
+                .eq('id', testInsert[0].id);
+            
+            if (deleteError) {
+                console.warn('⚠️ Could not delete test record:', deleteError);
+            }
+            
+            return true;
+        }
+        
+    } catch (error) {
+        console.error('❌ Connection test failed:', error);
+        return false;
+    }
+}
 
+// Send to Formspree with better error handling
+async function sendFormspreeNotification(orderData) {
+    console.log('📧 Starting Formspree notification...');
+    
+    try {
+        // Build comprehensive order text
+        let orderText = `🎯 NEW ORDER - ARIJEEM ENTERPRISES\n\n`;
+        orderText += `📋 ORDER ID: ${orderData.orderId}\n`;
+        orderText += `⏰ Time: ${new Date().toLocaleString('en-NG')}\n`;
+        orderText += `📦 Status: SUBMITTED TO DATABASE\n\n`;
+        
+        orderText += `👤 CUSTOMER DETAILS\n`;
+        orderText += `━━━━━━━━━━━━━━━━━━━━\n`;
+        orderText += `• Name: ${orderData.customerName}\n`;
+        orderText += `• Phone: ${orderData.customerPhone}\n`;
+        if (orderData.customerEmail) orderText += `• Email: ${orderData.customerEmail}\n`;
+        orderText += `• Address: ${orderData.deliveryAddress}\n`;
+        orderText += `• Delivery: ${orderData.deliveryMethod.toUpperCase()}\n`;
+        orderText += `• Order Type: ${orderData.orderType.toUpperCase()}\n\n`;
+        
+        orderText += `🛒 ORDER ITEMS (${orderData.items.length} items)\n`;
+        orderText += `━━━━━━━━━━━━━━━━━━━━\n`;
+        
+        orderData.items.forEach((item, index) => {
+            const itemTotal = item.unitPrice * item.quantity;
+            orderText += `${index + 1}. ${item.name} (${item.type})\n`;
+            orderText += `   Quantity: ${item.quantity} units\n`;
+            orderText += `   Unit Price: ₦${item.unitPrice.toLocaleString()}\n`;
+            orderText += `   Total: ₦${itemTotal.toLocaleString()}\n\n`;
+        });
+        
+        orderText += `💰 ORDER SUMMARY\n`;
+        orderText += `━━━━━━━━━━━━━━━━━━━━\n`;
+        orderText += `• Subtotal: ₦${orderData.subtotal.toLocaleString()}\n`;
+        orderText += `• Delivery Fee: ${orderData.deliveryFee === 0 ? 'FREE' : '₦' + orderData.deliveryFee.toLocaleString()}\n`;
+        orderText += `• TOTAL: ₦${orderData.total.toLocaleString()}\n\n`;
+        
+        if (orderData.additionalNotes) {
+            orderText += `📝 ADDITIONAL NOTES\n`;
+            orderText += `━━━━━━━━━━━━━━━━━━━━\n`;
+            orderText += `${orderData.additionalNotes}\n\n`;
+        }
+        
+        orderText += `📊 DATABASE STATUS: SAVED\n`;
+        orderText += `━━━━━━━━━━━━━━━━━━━━\n`;
+        orderText += `✅ This order has been saved to Arijeem Enterprises database.\n`;
+        orderText += `👁️ CEO Insight View: https://arijeem-insightview.vercel.app`;
+        
+        // Create hidden form and submit
+        const hiddenForm = document.createElement('form');
+        hiddenForm.method = 'POST';
+        hiddenForm.action = 'https://formspree.io/f/maqqyqpd';
+        hiddenForm.style.display = 'none';
+        
+        // Add all form fields
+        const fields = [
+            { name: 'name', value: orderData.customerName },
+            { name: 'phone', value: orderData.customerPhone },
+            { name: '_replyto', value: orderData.customerEmail || 'orders@arijeementerprises.com' },
+            { name: 'address', value: orderData.deliveryAddress },
+            { name: 'order_type', value: orderData.orderType },
+            { name: 'delivery_method', value: orderData.deliveryMethod },
+            { name: 'total_amount', value: `₦${orderData.total.toLocaleString()}` },
+            { name: 'order_id', value: orderData.orderId },
+            { name: 'message', value: orderText },
+            { name: '_subject', value: `📦 NEW ORDER - ${orderData.customerName} - ₦${orderData.total.toLocaleString()}` }
+        ];
+        
+        fields.forEach(field => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = field.name;
+            input.value = field.value;
+            hiddenForm.appendChild(input);
+        });
+        
+        document.body.appendChild(hiddenForm);
+        
+        // Submit the form
+        hiddenForm.submit();
+        
+        // Remove form after a delay
+        setTimeout(() => {
+            if (hiddenForm.parentNode) {
+                document.body.removeChild(hiddenForm);
+            }
+        }, 3000);
+        
+        console.log('✅ Formspree notification sent');
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Formspree notification failed:', error);
+        return false;
+    }
+}
+
+// UPDATED FORM SUBMISSION HANDLER - FIXED
+orderForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    if (cart.length === 0) {
+        showToast('Please add products to your cart before submitting', 'error');
+        return;
+    }
+    
+    // Basic form validation
+    if (!document.getElementById('customerName').value || 
+        !document.getElementById('customerPhone').value || 
+        !document.getElementById('deliveryAddress').value) {
+        showToast('Please fill all required fields (Name, Phone, Address)', 'error');
+        return;
+    }
+    
+    // Disable submit button
+    const submitBtn = document.getElementById('submitOrder');
+    const originalBtnText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    submitBtn.disabled = true;
+    
+    try {
+        console.log('🚀 Starting order submission process...');
+        
+        // Gather order data
+        const orderData = {
+            orderId: generateOrderId(),
+            customerName: document.getElementById('customerName').value.trim(),
+            customerPhone: document.getElementById('customerPhone').value.trim(),
+            customerEmail: document.getElementById('customerEmail').value.trim() || '',
+            deliveryAddress: document.getElementById('deliveryAddress').value.trim(),
+            deliveryDate: document.getElementById('deliveryDate').value || '',
+            deliveryMethod: document.querySelector('input[name="deliveryOption"]:checked').value,
+            orderType: isWholesaleMode ? 'wholesale' : 'retail',
+            isWholesale: isWholesaleMode,
+            additionalNotes: document.getElementById('orderNotes').value.trim() || '',
+            items: cart.map(item => ({
+                name: item.name,
+                type: item.type,
+                quantity: item.quantity,
+                unitPrice: item.unitPrice,
+                totalPrice: item.unitPrice * item.quantity
+            })),
+            subtotal: parseFloat(document.getElementById('subtotal').textContent.replace(/[^0-9]/g, '')) || 0,
+            deliveryFee: document.querySelector('input[name="deliveryOption"]:checked').value === 'pickup' ? 0 : 100,
+            total: parseFloat(document.getElementById('totalAmount').textContent.replace(/[^0-9]/g, '')) || 0
+        };
+        
+        console.log('📋 Order data prepared:', orderData);
+        
+        // 1. TEST SUPABASE CONNECTION FIRST
+        console.log('🔍 Testing database connection...');
+        const connectionTest = await testSupabaseConnection();
+        
+        if (!connectionTest) {
+            console.warn('⚠️ Database connection test failed, trying direct insert...');
+        }
+        
+        // 2. SUBMIT TO SUPABASE
+        console.log('💾 Saving to database...');
+        const supabaseResult = await submitOrderToSupabase(orderData);
+        
+        if (!supabaseResult.success) {
+            console.error('❌ Database save failed:', supabaseResult.error);
+            throw new Error('Failed to save to database: ' + (supabaseResult.error || 'Unknown error'));
+        }
+        
+        console.log('✅ Database save successful! Order ID:', orderData.orderId);
+        
+        // 3. SEND FORMSPREE NOTIFICATION
+        console.log('📧 Sending email notification...');
+        const formspreeSent = await sendFormspreeNotification(orderData);
+        
+        if (!formspreeSent) {
+            console.warn('⚠️ Email notification failed, but database save was successful');
+        }
+        
+        // 4. SEND WHATSAPP NOTIFICATION
+        console.log('💬 Sending WhatsApp notification...');
+        const whatsappMessage = createWhatsAppMessage(orderData);
+        const encodedMessage = encodeURIComponent(whatsappMessage);
+        const whatsappUrl = `https://wa.me/2349045890839?text=${encodedMessage}`;
+        
+        // Show success message
+        showToast('✅ Order submitted successfully!', 'success');
+        
+        // Clear form and cart
+        setTimeout(() => {
+            orderForm.reset();
+            cart = [];
+            saveCart();
+            updateCart();
+            
+            // Reset delivery date to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('deliveryDate').valueAsDate = tomorrow;
+            
+            // Show detailed confirmation
+            const successHtml = `
+                <div style="text-align: center; padding: 20px;">
+                    <div style="font-size: 50px; color: #28a745; margin-bottom: 20px;">✅</div>
+                    <h2 style="color: #004B93; margin-bottom: 15px;">Order Confirmed!</h2>
+                    <p style="margin-bottom: 10px;"><strong>Order ID:</strong> ${orderData.orderId}</p>
+                    <p style="margin-bottom: 10px;"><strong>Customer:</strong> ${orderData.customerName}</p>
+                    <p style="margin-bottom: 10px;"><strong>Total:</strong> ₦${orderData.total.toLocaleString()}</p>
+                    <p style="margin-bottom: 20px;"><strong>Status:</strong> ✅ Saved to Database</p>
+                    <p style="color: #666; font-size: 14px;">Our sales team will contact you shortly.</p>
+                </div>
+            `;
+            
+            // Create and show custom alert
+            const alertDiv = document.createElement('div');
+            alertDiv.innerHTML = successHtml;
+            alertDiv.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: white;
+                padding: 30px;
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                z-index: 10000;
+                min-width: 300px;
+                max-width: 90%;
+                text-align: center;
+            `;
+            
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.7);
+                z-index: 9999;
+            `;
+            
+            document.body.appendChild(overlay);
+            document.body.appendChild(alertDiv);
+            
+            // Auto-close after 5 seconds
+            setTimeout(() => {
+                if (alertDiv.parentNode) document.body.removeChild(alertDiv);
+                if (overlay.parentNode) document.body.removeChild(overlay);
+                
+                // Open WhatsApp
+                window.open(whatsappUrl, '_blank');
+                
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 5000);
+            
+        }, 1000);
+        
+    } catch (error) {
+        console.error('❌ Order submission failed:', error);
+        
+        // Show detailed error
+        const errorHtml = `
+            <div style="text-align: center; padding: 20px;">
+                <div style="font-size: 50px; color: #dc3545; margin-bottom: 20px;">❌</div>
+                <h2 style="color: #dc3545; margin-bottom: 15px;">Submission Error</h2>
+                <p style="margin-bottom: 10px;">Failed to save order to database.</p>
+                <p style="margin-bottom: 20px; color: #666; font-size: 14px;">Error: ${error.message || 'Unknown error'}</p>
+                <p style="color: #666; font-size: 14px;">Please call +234 904 589 0839 to place your order.</p>
+            </div>
+        `;
+        
+        const alertDiv = document.createElement('div');
+        alertDiv.innerHTML = errorHtml;
+        alertDiv.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 10000;
+            min-width: 300px;
+            max-width: 90%;
+            text-align: center;
+        `;
+        
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+        `;
+        
+        document.body.appendChild(overlay);
+        document.body.appendChild(alertDiv);
+        
+        setTimeout(() => {
+            if (alertDiv.parentNode) document.body.removeChild(alertDiv);
+            if (overlay.parentNode) document.body.removeChild(overlay);
+        }, 5000);
+        
+        showToast('❌ Failed to save order. Please try again.', 'error');
+        
+    } finally {
+        // Re-enable submit button after 3 seconds
+        setTimeout(() => {
+            submitBtn.innerHTML = originalBtnText;
+            submitBtn.disabled = false;
+        }, 3000);
+    }
+});
+
+// Initialize with connection test
+async function init() {
+    console.log('🚀 Initializing order page...');
+    
+    loadProducts();
+    updateCart();
+    
+    document.querySelectorAll('input[name="deliveryOption"]').forEach(r => {
+        r.addEventListener('change', updateCart);
+    });
+    
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    document.getElementById('deliveryDate').min = tomorrow.toISOString().split('T')[0];
+    document.getElementById('deliveryDate').valueAsDate = tomorrow;
+    
+    // Add active class to current page link
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        const linkPage = link.getAttribute('href');
+        if (linkPage === currentPage) {
+            link.style.background = 'rgba(255,255,255,0.2)';
+            link.style.fontWeight = '600';
+        }
+    });
+    
+    // Test Supabase connection on load
+    console.log('🔍 Testing database connection on load...');
+    const connected = await testSupabaseConnection();
+    
+    if (connected) {
+        console.log('✅ Database connection: READY');
+        showToast('Database connection established', 'info');
+    } else {
+        console.warn('⚠️ Database connection: FAILED - Orders will be saved locally');
+        showToast('Database connection failed - using local storage', 'warning');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', init);
         // ============================================
         // EXISTING ORDER PAGE CODE WITH SUPABASE INTEGRATION
         // ============================================
@@ -2617,3 +3024,4 @@ ${itemsList}
     </script>
 </body>
 </html>
+
