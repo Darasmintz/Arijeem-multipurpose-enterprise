@@ -1486,7 +1486,129 @@
         </div>
     </footer>
 
+    <!-- Supabase Client Library -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    
     <script>
+        // ============================================
+        // SUPABASE CONFIGURATION - Order Form
+        // ============================================
+
+        // Your Supabase credentials
+        const SUPABASE_URL = 'https://twnbpdqssvzuvdlfzdum.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3bmJwZHFzc3Z6dXZkbGZ6ZHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyNzQ0NzAsImV4cCI6MjA4Mzg1MDQ3MH0.XfPvPh4YZDES5gktKkj5KHtHmNTZmjye8LfDkBbpX-U';
+
+        // Initialize Supabase client
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // ============================================
+        // SUPABASE DATABASE FUNCTIONS FOR ORDERS
+        // ============================================
+
+        // Submit order to Supabase database
+        async function submitOrderToSupabase(orderData) {
+            try {
+                console.log('📦 Submitting order to Supabase...', orderData);
+                
+                // Prepare data for Supabase orders table
+                const orderDataForSupabase = {
+                    order_id: orderData.orderId,
+                    customer_name: orderData.customerName,
+                    customer_phone: orderData.customerPhone,
+                    customer_email: orderData.customerEmail || '',
+                    delivery_address: orderData.deliveryAddress,
+                    delivery_date: orderData.deliveryDate || null,
+                    delivery_method: orderData.deliveryMethod,
+                    order_type: orderData.orderType,
+                    subtotal: orderData.subtotal,
+                    delivery_fee: orderData.deliveryFee,
+                    total_amount: orderData.total,
+                    additional_notes: orderData.additionalNotes || '',
+                    status: 'pending',
+                    created_at: new Date().toISOString()
+                };
+                
+                console.log('📝 Order data for Supabase:', orderDataForSupabase);
+                
+                // Insert order into Supabase orders table
+                const { data: orderResult, error: orderError } = await supabaseClient
+                    .from('orders')
+                    .insert([orderDataForSupabase])
+                    .select();
+                
+                if (orderError) {
+                    console.error('❌ Error inserting order:', orderError);
+                    throw orderError;
+                }
+                
+                console.log('✅ Order inserted successfully:', orderResult);
+                const orderId = orderResult[0].id;
+                
+                // Insert order items into order_items table
+                if (orderData.items && orderData.items.length > 0) {
+                    const orderItems = orderData.items.map(item => ({
+                        order_id: orderId,
+                        product_name: item.name,
+                        product_type: item.type,
+                        quantity: item.quantity,
+                        unit_price: item.unitPrice,
+                        total_price: item.totalPrice,
+                        price_type: orderData.isWholesale ? 'wholesale' : 'retail',
+                        created_at: new Date().toISOString()
+                    }));
+                    
+                    const { error: itemsError } = await supabaseClient
+                        .from('order_items')
+                        .insert(orderItems);
+                    
+                    if (itemsError) {
+                        console.error('❌ Error inserting order items:', itemsError);
+                        throw itemsError;
+                    }
+                    
+                    console.log(`✅ ${orderItems.length} order items inserted successfully`);
+                }
+                
+                return { 
+                    success: true, 
+                    orderId: orderId,
+                    supabaseData: orderResult 
+                };
+                
+            } catch (error) {
+                console.error('❌ Supabase submission error:', error);
+                return { 
+                    success: false, 
+                    error: error.message || 'Failed to save order to database' 
+                };
+            }
+        }
+
+        // Test Supabase connection
+        async function testSupabaseConnection() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('orders')
+                    .select('count')
+                    .limit(1);
+                
+                if (error) {
+                    console.warn('⚠️ Supabase connection warning:', error.message);
+                    return false;
+                }
+                
+                console.log('✅ Supabase connection successful!');
+                return true;
+            } catch (error) {
+                console.warn('⚠️ Supabase connection test failed:', error.message);
+                return false;
+            }
+        }
+
+        // ============================================
+        // EXISTING ORDER PAGE CODE WITH SUPABASE INTEGRATION
+        // ============================================
+
         // COMPLETE Product Data with ALL products restored
         const products = {
             water: [
@@ -1906,6 +2028,13 @@
             }, 3000);
         }
 
+        // Generate unique order ID
+        function generateOrderId() {
+            const timestamp = Date.now().toString().slice(-6);
+            const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            return `AE${timestamp}${random}`;
+        }
+
         // CLICKABLE Admin Toggle Button
         adminToggleBtn.addEventListener('click', function(event) {
             console.log("✅ Admin toggle button CLICKED!");
@@ -2095,7 +2224,8 @@
                     type: product.type,
                     unitPrice: unitPrice,
                     quantity: quantity,
-                    minWholesale: product.minWholesale
+                    minWholesale: product.minWholesale,
+                    totalPrice: unitPrice * quantity
                 });
             }
             
@@ -2128,6 +2258,7 @@
                 const product = findProduct(item.id);
                 if (product) {
                     item.unitPrice = calculatePrice(product, item.quantity);
+                    item.totalPrice = item.unitPrice * item.quantity;
                 }
             });
             saveCart();
@@ -2146,6 +2277,7 @@
             if (cart[itemIndex].quantity > 999) cart[itemIndex].quantity = 999;
             
             cart[itemIndex].unitPrice = calculatePrice(product, cart[itemIndex].quantity);
+            cart[itemIndex].totalPrice = cart[itemIndex].unitPrice * cart[itemIndex].quantity;
             
             saveCart();
             updateCart();
@@ -2217,198 +2349,242 @@
             submitOrderBtn.disabled = false;
         }
 
-        // FORM SUBMISSION WITH FORMSPREE INTEGRATION - WORKING VERSION
-orderForm.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    if (cart.length === 0) {
-        showToast('Please add products to your cart before submitting', 'error');
-        return;
-    }
-    
-    // Disable submit button
-    const submitBtn = document.getElementById('submitOrder');
-    const originalBtnText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending Order...';
-    submitBtn.disabled = true;
-    
-    try {
-        // Build order text for Formspree
-        let orderText = `📦 NEW ORDER - ARIJEEM ENTERPRISES\n\n`;
-        orderText += `👤 CUSTOMER INFORMATION\n`;
-        orderText += `Full Name: ${document.getElementById('customerName').value}\n`;
-        orderText += `Phone: ${document.getElementById('customerPhone').value}\n`;
-        orderText += `Email: ${document.getElementById('customerEmail').value || 'Not provided'}\n`;
-        orderText += `Delivery Address: ${document.getElementById('deliveryAddress').value}\n`;
-        
-        const deliveryDate = document.getElementById('deliveryDate').value;
-        orderText += `Preferred Delivery Date: ${deliveryDate ? new Date(deliveryDate).toLocaleDateString('en-NG') : 'ASAP'}\n`;
-        
-        orderText += `Order Type: ${isWholesaleMode ? 'WHOLESALE (50+ units)' : 'RETAIL (1-49 units)'}\n`;
-        
-        const deliveryMethod = document.querySelector('input[name="deliveryOption"]:checked').value;
-        orderText += `Delivery Method: ${deliveryMethod === 'pickup' ? 'PICKUP (Free)' : 'DELIVERY (₦100 fee)'}\n\n`;
-        
-        // Order Items
-        orderText += `🛒 ORDER ITEMS\n`;
-        orderText += `================\n`;
-        
-        let subtotal = 0;
-        cart.forEach(item => {
-            const product = findProduct(item.id);
-            const itemTotal = item.unitPrice * item.quantity;
-            subtotal += itemTotal;
+        // ============================================
+        // FORM SUBMISSION WITH SUPABASE INTEGRATION
+        // ============================================
+        orderForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
             
-            const priceType = priceOverrides[item.id] ? 'CUSTOM PRICE' : 
-                           (item.quantity >= item.minWholesale ? 'WHOLESALE' : 'RETAIL');
+            if (cart.length === 0) {
+                showToast('Please add products to your cart before submitting', 'error');
+                return;
+            }
             
-            orderText += `${item.name} (${product.type})\n`;
-            orderText += `  Quantity: ${item.quantity} units\n`;
-            orderText += `  Unit Price: ₦${item.unitPrice.toLocaleString()}\n`;
-            orderText += `  Total: ₦${itemTotal.toLocaleString()}\n`;
-            orderText += `  Price Type: ${priceType}\n\n`;
+            // Disable submit button
+            const submitBtn = document.getElementById('submitOrder');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            submitBtn.disabled = true;
+            
+            try {
+                // Gather order data
+                const orderData = {
+                    orderId: generateOrderId(),
+                    customerName: document.getElementById('customerName').value,
+                    customerPhone: document.getElementById('customerPhone').value,
+                    customerEmail: document.getElementById('customerEmail').value || '',
+                    deliveryAddress: document.getElementById('deliveryAddress').value,
+                    deliveryDate: document.getElementById('deliveryDate').value || '',
+                    deliveryMethod: document.querySelector('input[name="deliveryOption"]:checked').value,
+                    orderType: isWholesaleMode ? 'wholesale' : 'retail',
+                    isWholesale: isWholesaleMode,
+                    additionalNotes: document.getElementById('orderNotes').value || '',
+                    items: cart.map(item => ({
+                        name: item.name,
+                        type: item.type,
+                        quantity: item.quantity,
+                        unitPrice: item.unitPrice,
+                        totalPrice: item.unitPrice * item.quantity
+                    })),
+                    subtotal: parseFloat(document.getElementById('subtotal').textContent.replace(/[^0-9]/g, '')) || 0,
+                    deliveryFee: document.querySelector('input[name="deliveryOption"]:checked').value === 'pickup' ? 0 : 100,
+                    total: parseFloat(document.getElementById('totalAmount').textContent.replace(/[^0-9]/g, '')) || 0,
+                    createdAt: new Date().toISOString()
+                };
+                
+                console.log('📦 Order data prepared:', orderData);
+                
+                // 1. Submit to Supabase Database
+                console.log('🚀 Submitting to Supabase...');
+                const supabaseResult = await submitOrderToSupabase(orderData);
+                
+                if (!supabaseResult.success) {
+                    throw new Error(`Supabase error: ${supabaseResult.error}`);
+                }
+                
+                console.log('✅ Successfully saved to Supabase database! Order ID:', supabaseResult.orderId);
+                
+                // 2. Send to Formspree (backup/notification)
+                try {
+                    console.log('📧 Sending email notification via Formspree...');
+                    await sendFormspreeNotification(orderData);
+                    console.log('✅ Email notification sent!');
+                } catch (formspreeError) {
+                    console.log('⚠️ Formspree notification failed, but Supabase succeeded:', formspreeError);
+                }
+                
+                // 3. Send WhatsApp notification
+                const whatsappMessage = createWhatsAppMessage(orderData);
+                const encodedMessage = encodeURIComponent(whatsappMessage);
+                const whatsappUrl = `https://wa.me/2349045890839?text=${encodedMessage}`;
+                
+                showToast('✅ Order submitted successfully to database!', 'success');
+                
+                // 4. Open WhatsApp in new tab
+                setTimeout(() => {
+                    window.open(whatsappUrl, '_blank');
+                }, 1500);
+                
+                // 5. Clear form and cart
+                setTimeout(() => {
+                    orderForm.reset();
+                    cart = [];
+                    saveCart();
+                    updateCart();
+                    
+                    // Reset delivery date to tomorrow
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    document.getElementById('deliveryDate').valueAsDate = tomorrow;
+                    
+                    // Show confirmation to customer
+                    alert(`🎉 ORDER CONFIRMED!\n\nThank you ${orderData.customerName}!\n\nOrder ID: ${orderData.orderId}\nTotal: ₦${orderData.total.toLocaleString()}\n\nYour order has been saved to our database and our sales team will contact you at ${orderData.customerPhone} to confirm delivery.`);
+                    
+                    // Scroll to top
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    
+                }, 2000);
+                
+            } catch (error) {
+                console.error('❌ Order submission error:', error);
+                showToast('❌ Failed to save order. Please try again or call +234 904 589 0839', 'error');
+                
+                // Fallback: Show order details in alert
+                let fallbackSummary = `ORDER DETAILS (Please Call to Complete):\n\n`;
+                fallbackSummary += `Customer: ${document.getElementById('customerName').value}\n`;
+                fallbackSummary += `Phone: ${document.getElementById('customerPhone').value}\n`;
+                fallbackSummary += `Address: ${document.getElementById('deliveryAddress').value}\n\n`;
+                fallbackSummary += `ITEMS:\n`;
+                
+                cart.forEach(item => {
+                    fallbackSummary += `• ${item.name}: ${item.quantity} × ₦${item.unitPrice} = ₦${item.unitPrice * item.quantity}\n`;
+                });
+                
+                const deliveryMethod = document.querySelector('input[name="deliveryOption"]:checked').value;
+                const deliveryFee = deliveryMethod === 'pickup' ? 0 : 100;
+                const subtotal = cart.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
+                const total = subtotal + deliveryFee;
+                
+                fallbackSummary += `\nSubtotal: ₦${subtotal.toLocaleString()}\n`;
+                fallbackSummary += `Delivery: ${deliveryFee === 0 ? 'FREE' : '₦' + deliveryFee}\n`;
+                fallbackSummary += `TOTAL: ₦${total.toLocaleString()}\n\n`;
+                fallbackSummary += `Please call +234 904 589 0839 to complete your order.`;
+                
+                alert(fallbackSummary);
+            } finally {
+                // Re-enable submit button after 3 seconds
+                setTimeout(() => {
+                    submitBtn.innerHTML = originalBtnText;
+                    submitBtn.disabled = false;
+                }, 3000);
+            }
         });
-        
-        // Price Summary
-        const deliveryFee = deliveryMethod === 'pickup' ? 0 : 100;
-        const total = subtotal + deliveryFee;
-        
-        orderText += `💰 ORDER SUMMARY\n`;
-        orderText += `================\n`;
-        orderText += `Subtotal: ₦${subtotal.toLocaleString()}\n`;
-        orderText += `Delivery Fee: ${deliveryFee === 0 ? 'FREE' : '₦' + deliveryFee.toLocaleString()}\n`;
-        orderText += `TOTAL AMOUNT: ₦${total.toLocaleString()}\n\n`;
-        
-        // Additional Notes
-        const orderNotes = document.getElementById('orderNotes').value;
-        if (orderNotes) {
-            orderText += `📝 ADDITIONAL NOTES\n`;
+
+        // Send notification via Formspree
+        async function sendFormspreeNotification(orderData) {
+            let orderText = `📦 NEW ORDER - ARIJEEM ENTERPRISES\n\n`;
+            orderText += `👤 CUSTOMER INFORMATION\n`;
+            orderText += `Order ID: ${orderData.orderId}\n`;
+            orderText += `Full Name: ${orderData.customerName}\n`;
+            orderText += `Phone: ${orderData.customerPhone}\n`;
+            orderText += `Email: ${orderData.customerEmail || 'Not provided'}\n`;
+            orderText += `Delivery Address: ${orderData.deliveryAddress}\n`;
+            
+            if (orderData.deliveryDate) {
+                orderText += `Preferred Delivery Date: ${new Date(orderData.deliveryDate).toLocaleDateString('en-NG')}\n`;
+            }
+            
+            orderText += `Order Type: ${orderData.orderType.toUpperCase()}\n`;
+            orderText += `Delivery Method: ${orderData.deliveryMethod === 'pickup' ? 'PICKUP (Free)' : 'DELIVERY (₦100 fee)'}\n\n`;
+            
+            // Order Items
+            orderText += `🛒 ORDER ITEMS\n`;
             orderText += `================\n`;
-            orderText += `${orderNotes}\n\n`;
+            
+            orderData.items.forEach((item, index) => {
+                orderText += `${index + 1}. ${item.name} (${item.type})\n`;
+                orderText += `   Quantity: ${item.quantity} units\n`;
+                orderText += `   Unit Price: ₦${item.unitPrice.toLocaleString()}\n`;
+                orderText += `   Total: ₦${(item.unitPrice * item.quantity).toLocaleString()}\n\n`;
+            });
+            
+            // Price Summary
+            orderText += `💰 ORDER SUMMARY\n`;
+            orderText += `================\n`;
+            orderText += `Subtotal: ₦${orderData.subtotal.toLocaleString()}\n`;
+            orderText += `Delivery Fee: ${orderData.deliveryFee === 0 ? 'FREE' : '₦' + orderData.deliveryFee.toLocaleString()}\n`;
+            orderText += `TOTAL AMOUNT: ₦${orderData.total.toLocaleString()}\n\n`;
+            
+            // Additional Notes
+            if (orderData.additionalNotes) {
+                orderText += `📝 ADDITIONAL NOTES\n`;
+                orderText += `================\n`;
+                orderText += `${orderData.additionalNotes}\n\n`;
+            }
+            
+            orderText += `Order Submitted: ${new Date().toLocaleString('en-NG')}\n`;
+            orderText += `✅ SAVED TO DATABASE: This order has been saved to Arijeem Enterprises database`;
+            
+            const form = new FormData();
+            form.append('name', orderData.customerName);
+            form.append('phone', orderData.customerPhone);
+            form.append('_replyto', orderData.customerEmail || 'orders@arijeementerprises.com');
+            form.append('address', orderData.deliveryAddress);
+            form.append('order_type', orderData.orderType);
+            form.append('total', `₦${orderData.total.toLocaleString()}`);
+            form.append('message', orderText);
+            form.append('_subject', `📦 NEW ORDER - ${orderData.customerName} - ₦${orderData.total.toLocaleString()}`);
+            
+            const response = await fetch('https://formspree.io/f/maqqyqpd', {
+                method: 'POST',
+                body: form,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error('Formspree submission failed');
+            }
+            
+            return response;
         }
-        
-        orderText += `Order Submitted: ${new Date().toLocaleString('en-NG')}\n`;
-        orderText += `This order was submitted through Arijeem Enterprises online ordering system`;
-        
-        // ⭐⭐ KEY FIX: Create a HIDDEN FORM and submit it to Formspree ⭐⭐
-        const hiddenForm = document.createElement('form');
-        hiddenForm.method = 'POST';
-        hiddenForm.action = 'https://formspree.io/f/maqqyqpd';
-        hiddenForm.style.display = 'none';
-        
-        // Add required fields for Formspree
-        const nameInput = document.createElement('input');
-        nameInput.type = 'hidden';
-        nameInput.name = 'name';
-        nameInput.value = document.getElementById('customerName').value;
-        hiddenForm.appendChild(nameInput);
-        
-        const phoneInput = document.createElement('input');
-        phoneInput.type = 'hidden';
-        phoneInput.name = 'phone';
-        phoneInput.value = document.getElementById('customerPhone').value;
-        hiddenForm.appendChild(phoneInput);
-        
-        const emailInput = document.createElement('input');
-        emailInput.type = 'hidden';
-        emailInput.name = '_replyto';
-        emailInput.value = document.getElementById('customerEmail').value || 'orders@arijeementerprises.com';
-        hiddenForm.appendChild(emailInput);
-        
-        const addressInput = document.createElement('input');
-        addressInput.type = 'hidden';
-        addressInput.name = 'address';
-        addressInput.value = document.getElementById('deliveryAddress').value;
-        hiddenForm.appendChild(addressInput);
-        
-        const orderTypeInput = document.createElement('input');
-        orderTypeInput.type = 'hidden';
-        orderTypeInput.name = 'order_type';
-        orderTypeInput.value = isWholesaleMode ? 'wholesale' : 'retail';
-        hiddenForm.appendChild(orderTypeInput);
-        
-        const totalInput = document.createElement('input');
-        totalInput.type = 'hidden';
-        totalInput.name = 'total';
-        totalInput.value = `₦${total.toLocaleString()}`;
-        hiddenForm.appendChild(totalInput);
-        
-        const messageInput = document.createElement('input');
-        messageInput.type = 'hidden';
-        messageInput.name = 'message';
-        messageInput.value = orderText;
-        hiddenForm.appendChild(messageInput);
-        
-        // Add subject
-        const subjectInput = document.createElement('input');
-        subjectInput.type = 'hidden';
-        subjectInput.name = '_subject';
-        subjectInput.value = `📦 NEW ORDER - ${document.getElementById('customerName').value} - ₦${total.toLocaleString()}`;
-        hiddenForm.appendChild(subjectInput);
-        
-        // Add to body and submit
-        document.body.appendChild(hiddenForm);
-        
-        // ⭐⭐ METHOD 1: Direct Form Submission (Most Reliable)
-        hiddenForm.submit();
-        
-        // Clear form and cart after successful submission
-        setTimeout(() => {
-            orderForm.reset();
-            cart = [];
-            saveCart();
-            updateCart();
+
+        // Create WhatsApp message
+        function createWhatsAppMessage(orderData) {
+            const itemsList = orderData.items.map((item, index) => 
+                `${index + 1}. ${item.name}: ${item.quantity} × ₦${item.unitPrice} = ₦${(item.unitPrice * item.quantity).toLocaleString()}`
+            ).join('\n');
             
-            // Reset delivery date to tomorrow
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            document.getElementById('deliveryDate').valueAsDate = tomorrow;
-            
-            showToast('✅ Order sent successfully! Check your email for confirmation.', 'success');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            
-            // Show confirmation to customer
-            alert(`📦 ORDER CONFIRMED!\n\nThank you ${document.getElementById('customerName').value}!\n\nYour order of ₦${total.toLocaleString()} has been received.\n\nWe will contact you at ${document.getElementById('customerPhone').value} to confirm delivery.`);
-            
-            // Remove the hidden form
-            document.body.removeChild(hiddenForm);
-            
-        }, 1000);
-        
-    } catch (error) {
-        console.error('Order submission error:', error);
-        showToast('❌ Failed to send order. Please try again or call +234 803 123 4567', 'error');
-        
-        // Fallback: Show order details in alert
-        let fallbackSummary = `ORDER DETAILS (Please Call to Complete):\n\n`;
-        fallbackSummary += `Customer: ${document.getElementById('customerName').value}\n`;
-        fallbackSummary += `Phone: ${document.getElementById('customerPhone').value}\n`;
-        fallbackSummary += `Address: ${document.getElementById('deliveryAddress').value}\n\n`;
-        fallbackSummary += `ITEMS:\n`;
-        
-        cart.forEach(item => {
-            fallbackSummary += `• ${item.name}: ${item.quantity} × ₦${item.unitPrice} = ₦${item.unitPrice * item.quantity}\n`;
-        });
-        
-        const deliveryMethod = document.querySelector('input[name="deliveryOption"]:checked').value;
-        const deliveryFee = deliveryMethod === 'pickup' ? 0 : 100;
-        const subtotal = cart.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
-        const total = subtotal + deliveryFee;
-        
-        fallbackSummary += `\nSubtotal: ₦${subtotal.toLocaleString()}\n`;
-        fallbackSummary += `Delivery: ${deliveryFee === 0 ? 'FREE' : '₦' + deliveryFee}\n`;
-        fallbackSummary += `TOTAL: ₦${total.toLocaleString()}\n\n`;
-        fallbackSummary += `Please call +234 803 123 4567 to complete your order.`;
-        
-        alert(fallbackSummary);
-    } finally {
-        // Re-enable submit button after 3 seconds
-        setTimeout(() => {
-            submitBtn.innerHTML = originalBtnText;
-            submitBtn.disabled = false;
-        }, 3000);
-    }
-});
+            return `🎯 *NEW ORDER - ARIJEEM ENTERPRISES*
+
+👤 *Customer Details*
+• Order ID: ${orderData.orderId}
+• Name: ${orderData.customerName}
+• Phone: ${orderData.customerPhone}
+• Email: ${orderData.customerEmail || 'Not provided'}
+
+📍 *Delivery Details*
+• Address: ${orderData.deliveryAddress}
+• Method: ${orderData.deliveryMethod === 'pickup' ? 'Pickup' : 'Delivery'}
+• Date: ${orderData.deliveryDate ? new Date(orderData.deliveryDate).toLocaleDateString('en-NG') : 'ASAP'}
+• Type: ${orderData.orderType.toUpperCase()}
+
+🛒 *Order Items (${orderData.items.length})*
+${itemsList}
+
+💰 *Order Summary*
+• Subtotal: ₦${orderData.subtotal.toLocaleString()}
+• Delivery: ${orderData.deliveryFee === 0 ? 'FREE' : '₦' + orderData.deliveryFee}
+• *TOTAL: ₦${orderData.total.toLocaleString()}*
+
+📝 Notes: ${orderData.additionalNotes || 'None'}
+
+━━━━━━━━━━━━━━━━━━━━
+*Status: ✅ Saved to Database*
+*Time: ${new Date().toLocaleString('en-NG')}*`;
+        }
+
         // Initialize
         function init() {
             loadProducts();
@@ -2432,10 +2608,12 @@ orderForm.addEventListener('submit', async function(e) {
                     link.style.fontWeight = '600';
                 }
             });
+            
+            // Test Supabase connection on load
+            testSupabaseConnection();
         }
 
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
-
