@@ -859,6 +859,7 @@
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
+            box-shadow: none;
         }
        
         .whatsapp-option {
@@ -1727,7 +1728,7 @@ ${productsList}
             }
         });
 
-        // Product database
+        // Product database - UPDATED WITH ALL 31 PRODUCTS INCLUDING 8 NEW ONES
         const products = {
             water: [
                 {name: "Nirvana", retail: 1400, wholesale: 1300, type: "PET", bottleType: "PET", category: "water"},
@@ -1756,10 +1757,23 @@ ${productsList}
                 {name: "PET 60CL", retail: 4250, wholesale: 4150, type: "PET", bottleType: "Plastic", category: "pet"},
                 {name: "PET 40CL", retail: 2320, wholesale: 2300, type: "PET", bottleType: "Plastic", category: "pet"},
                 {name: "Aquafina 50CL", retail: 1700, wholesale: 1650, type: "PET", bottleType: "Plastic", category: "pet"},
-                {name: "Aquafina 75CL", retail: 2200, wholesale: 2150, type: "PET", bottleType: "Plastic", category: "pet"}
+                {name: "Aquafina 75CL", retail: 2200, wholesale: 2150, type: "PET", bottleType: "Plastic", category: "pet"},
+                // NEW VARIABLE PRICING PRODUCTS ADDED HERE
+                {name: "5 Alive Blast", retail: 0, wholesale: 0, type: "Variable", bottleType: "Plastic", category: "pet", requiresInput: true, threshold: 1},
+                {name: "5 Alive Pulpy Orange", retail: 0, wholesale: 0, type: "Variable", bottleType: "Plastic", category: "pet", requiresInput: true, threshold: 1},
+                {name: "Coke Schweppes", retail: 0, wholesale: 0, type: "Variable", bottleType: "Plastic", category: "pet", requiresInput: true, threshold: 1},
+                {name: "Mr. V", retail: 0, wholesale: 0, type: "Variable", bottleType: "Plastic", category: "pet", requiresInput: true, threshold: 1}
             ],
             cans: [
-                {name: "Dubic Can", retail: 12000, wholesale: 11000, type: "Cans", bottleType: "Can", category: "cans", threshold: 30}
+                {name: "Dubic Can", retail: 12000, wholesale: 11000, type: "Cans", bottleType: "Can", category: "cans", threshold: 30},
+                // NEW VARIABLE PRICING PRODUCTS ADDED HERE
+                {name: "Coke Can", retail: 0, wholesale: 0, type: "Variable", bottleType: "Can", category: "cans", requiresInput: true, threshold: 1},
+                {name: "Monster Energy", retail: 0, wholesale: 0, type: "Variable", bottleType: "Can", category: "cans", requiresInput: true, threshold: 1}
+            ],
+            energy: [
+                // NEW VARIABLE PRICING PRODUCTS ADDED HERE
+                {name: "BIG 25ml", retail: 0, wholesale: 0, type: "Variable", bottleType: "Bottle", category: "energy", requiresInput: true, threshold: 1},
+                {name: "Blackhood", retail: 0, wholesale: 0, type: "Variable", bottleType: "Bottle", category: "energy", requiresInput: true, threshold: 1}
             ]
         };
 
@@ -1793,6 +1807,7 @@ ${productsList}
                             <option value="rgb">RGB (Glass Bottles)</option>
                             <option value="pet">PET (Plastic Bottles)</option>
                             <option value="cans">Cans</option>
+                            <option value="energy">Energy Drinks</option>
                         </select>
                     </div>
                    
@@ -1860,6 +1875,7 @@ ${productsList}
                     option.dataset.type = product.type;
                     option.dataset.bottleType = product.bottleType;
                     option.dataset.threshold = product.threshold || 50;
+                    option.dataset.requiresInput = product.requiresInput || false;
                     productSelect.appendChild(option);
                 });
             }
@@ -1878,20 +1894,32 @@ ${productsList}
                 const retailPrice = parseInt(selectedOption.dataset.retail);
                 const wholesalePrice = parseInt(selectedOption.dataset.wholesale);
                 const threshold = parseInt(selectedOption.dataset.threshold) || 50;
+                const requiresInput = selectedOption.dataset.requiresInput === "true";
                
                 let unitPrice;
-                if (quantity >= threshold) {
+                if (requiresInput) {
+                    // Variable pricing products
+                    unitPrice = 0;
+                    unitPriceSpan.textContent = `🔄 Input Required`;
+                    unitPriceSpan.style.color = 'var(--warning)';
+                } else if (quantity >= threshold) {
                     unitPrice = wholesalePrice;
+                    unitPriceSpan.textContent = `₦${unitPrice.toLocaleString()}`;
+                    unitPriceSpan.style.color = '';
                 } else {
                     unitPrice = retailPrice;
+                    unitPriceSpan.textContent = `₦${unitPrice.toLocaleString()}`;
+                    unitPriceSpan.style.color = '';
                 }
                
-                const totalPrice = quantity * unitPrice;
-                unitPriceSpan.textContent = `₦${unitPrice.toLocaleString()}`;
-                totalPriceSpan.textContent = `₦${totalPrice.toLocaleString()}`;
+                const totalPrice = requiresInput ? 0 : quantity * unitPrice;
+                totalPriceSpan.textContent = requiresInput ? `🔄 Input Required` : `₦${totalPrice.toLocaleString()}`;
+                totalPriceSpan.style.color = requiresInput ? 'var(--warning)' : '';
             } else {
                 unitPriceSpan.textContent = '₦0';
+                unitPriceSpan.style.color = '';
                 totalPriceSpan.textContent = '₦0';
+                totalPriceSpan.style.color = '';
             }
            
             updateOrderSummary();
@@ -1922,23 +1950,36 @@ ${productsList}
                     const retailPrice = parseInt(selectedOption.dataset.retail);
                     const wholesalePrice = parseInt(selectedOption.dataset.wholesale);
                     const threshold = parseInt(selectedOption.dataset.threshold) || 50;
+                    const requiresInput = selectedOption.dataset.requiresInput === "true";
                    
                     let unitPrice;
-                    if (quantity >= threshold) {
+                    let productTotal;
+                    let displayText;
+                   
+                    if (requiresInput) {
+                        unitPrice = 0;
+                        productTotal = 0;
+                        displayText = `${productSelect.value} (${quantity} × 🔄 Input Required)`;
+                    } else if (quantity >= threshold) {
                         unitPrice = wholesalePrice;
+                        productTotal = quantity * unitPrice;
+                        displayText = `${productSelect.value} (${quantity} × ₦${unitPrice.toLocaleString()})`;
                     } else {
                         unitPrice = retailPrice;
+                        productTotal = quantity * unitPrice;
+                        displayText = `${productSelect.value} (${quantity} × ₦${unitPrice.toLocaleString()})`;
                     }
                    
-                    const productTotal = quantity * unitPrice;
                     subtotal += productTotal;
                    
                     // Add to summary items
                     const summaryItem = document.createElement('div');
                     summaryItem.className = 'summary-item';
                     summaryItem.innerHTML = `
-                        <span>${productSelect.value} (${quantity} × ₦${unitPrice.toLocaleString()})</span>
-                        <span>₦${productTotal.toLocaleString()}</span>
+                        <span>${displayText}</span>
+                        <span style="${requiresInput ? 'color: var(--warning); font-weight: bold;' : ''}">
+                            ${requiresInput ? '🔄 Price Required' : '₦' + productTotal.toLocaleString()}
+                        </span>
                     `;
                     summaryItems.appendChild(summaryItem);
                 }
@@ -2024,9 +2065,12 @@ ${productsList}
                     const retailPrice = parseInt(selectedOption.dataset.retail);
                     const wholesalePrice = parseInt(selectedOption.dataset.wholesale);
                     const threshold = parseInt(selectedOption.dataset.threshold) || 50;
+                    const requiresInput = selectedOption.dataset.requiresInput === "true";
                    
                     let unitPrice;
-                    if (quantity >= threshold) {
+                    if (requiresInput) {
+                        unitPrice = 0;
+                    } else if (quantity >= threshold) {
                         unitPrice = wholesalePrice;
                     } else {
                         unitPrice = retailPrice;
@@ -2039,7 +2083,8 @@ ${productsList}
                         unitPrice: unitPrice,
                         total: quantity * unitPrice,
                         bottleType: selectedOption.dataset.bottleType,
-                        priceType: (quantity >= threshold) ? 'Wholesale' : 'Retail'
+                        priceType: (quantity >= threshold) ? 'Wholesale' : 'Retail',
+                        requiresInput: requiresInput
                     });
                 }
             });
@@ -2163,6 +2208,17 @@ ${productsList}
                     submitBtn.innerHTML = originalBtnText;
                     submitBtn.disabled = false;
                     return;
+                }
+               
+                // Check for variable pricing products
+                const hasVariablePricing = formData.products.some(product => product.requiresInput);
+                if (hasVariablePricing) {
+                    const confirmSubmit = confirm('⚠️ Your order contains products that require price input. The sales team will contact you to confirm prices before processing. Continue?');
+                    if (!confirmSubmit) {
+                        submitBtn.innerHTML = originalBtnText;
+                        submitBtn.disabled = false;
+                        return;
+                    }
                 }
                
                 // Show custom loader
