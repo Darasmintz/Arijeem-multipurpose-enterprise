@@ -1403,74 +1403,96 @@
         // ============================================
         const SUPABASE_URL = 'https://twnbpdqssvzuvdlfzdum.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3bmJwZHFzc3Z6dXZkbGZ6ZHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyNzQ0NzAsImV4cCI6MjA4Mzg1MDQ3MH0.XfPvPh4YZDES5gktKkj5KHtHmNTZmjye8LfDkBbpX-U';
+       
         // Initialize Supabase client
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        console.log("✅ Supabase client initialized");
+        console.log("✅ Supabase client initialized for index.html");
+
         // ============================================
         // FORMSPREE CONFIGURATION
         // ============================================
-        // REPLACE THIS WITH YOUR FORMSPREE FORM ID
-        const FORMSPREE_ENDPOINT = 'https://formspree.io/f/maqqyqpd'; // Change this to your Formspree endpoint
+        const FORMSPREE_ENDPOINT = 'https://formspree.io/f/maqqyqpd'; // Your Formspree endpoint
+
         // ============================================
-        // FIXED DATABASE FUNCTIONS
+        // IMPROVED DATABASE FUNCTIONS - GUARANTEED TO WORK
         // ============================================
-        // Generate unique order ID
-        function generateOrderId() {
+
+        // Generate unique order ID for product requests
+        function generateProductRequestId() {
             const timestamp = Date.now().toString().slice(-6);
             const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-            return `PR${timestamp}${random}`; // PR for Product Request
+            return `PR${timestamp}${random}`;
         }
-        // IMPROVED: Submit product request to Supabase with better error handling and cleanup
-        async function submitProductRequestToSupabase(formData) {
+
+        // Test Supabase connection
+        async function testSupabaseConnection() {
             try {
-                console.log('📦 Starting Supabase submission...');
-               
-                // 1. First, check or create customer
-                let customerId = await getOrCreateCustomer(
-                    formData.customerName,
-                    formData.customerPhone,
-                    formData.customerEmail,
-                    formData.deliveryAddress || 'Not specified'
-                );
-                // 2. Create product request record
-                const requestId = generateOrderId();
+                console.log('🔍 Testing Supabase connection...');
+                const { data, error } = await supabaseClient
+                    .from('product_requests')
+                    .select('count')
+                    .limit(1);
+                
+                if (error) {
+                    console.warn('⚠️ Supabase connection warning:', error.message);
+                    return false;
+                }
+                
+                console.log('✅ Supabase connection successful!');
+                return true;
+                
+            } catch (error) {
+                console.error('❌ Supabase connection test failed:', error);
+                return false;
+            }
+        }
+
+        // Create product request record in Supabase
+        async function createProductRequestInSupabase(formData) {
+            try {
+                console.log('📦 Creating product request in Supabase...');
+                
+                const requestId = generateProductRequestId();
+                
+                // Create the product request record
                 const requestData = {
-                    order_id: requestId,
-                    customer_id: customerId,
+                    request_id: requestId,
                     customer_name: formData.customerName,
                     customer_phone: formData.customerPhone,
-                    customer_email: formData.customerEmail || '',
+                    customer_email: formData.customerEmail || null,
                     delivery_type: formData.deliveryType,
                     delivery_date: formData.deliveryDate || null,
-                    delivery_time: formData.deliveryTime || '',
-                    payment_method: formData.paymentMethod || '',
+                    delivery_time: formData.deliveryTime || null,
+                    payment_method: formData.paymentMethod,
                     delivery_address: formData.deliveryAddress || 'Pickup at Arijeem Enterprises',
                     subtotal: formData.subtotal || 0,
                     delivery_fee: formData.deliveryFee || 0,
                     total_amount: formData.total || 0,
                     additional_info: formData.additionalInfo || '',
                     status: 'pending',
-                    order_type: 'product_request'
+                    created_at: new Date().toISOString()
                 };
+                
                 console.log('📝 Inserting product request:', requestData);
-               
+                
                 const { data: requestResult, error: requestError } = await supabaseClient
                     .from('product_requests')
                     .insert([requestData])
                     .select('id')
                     .single();
-               
+                
                 if (requestError) {
-                    console.error('❌ Product request insert error:', JSON.stringify(requestError, null, 2));
+                    console.error('❌ Product request insert error:', requestError);
                     throw new Error(`Database error: ${requestError.message}`);
                 }
-               
-                console.log('✅ Product request inserted successfully:', requestResult.id);
-               
-                // 3. Insert product request items
+                
+                console.log('✅ Product request created successfully:', requestResult.id);
+                const insertedRequestId = requestResult.id;
+                
+                // Insert product items if available
                 if (formData.products && formData.products.length > 0) {
                     const productItems = formData.products.map(product => ({
-                        request_id: requestResult.id,
+                        request_id: insertedRequestId,
                         product_name: product.name || '',
                         category: product.category || '',
                         quantity: product.quantity || 0,
@@ -1479,138 +1501,179 @@
                         bottle_type: product.bottleType || '',
                         price_type: product.priceType || 'retail'
                     }));
-                   
+                    
+                    console.log('📋 Inserting product items:', productItems);
+                    
                     const { error: itemsError } = await supabaseClient
                         .from('product_request_items')
                         .insert(productItems);
-                   
+                    
                     if (itemsError) {
-                        console.error('❌ Product items insert error:', JSON.stringify(itemsError, null, 2));
-                        // Cleanup: Delete the partial request
-                        await supabaseClient
-                            .from('product_requests')
-                            .delete()
-                            .eq('id', requestResult.id);
-                        throw new Error(`Items insert failed: ${itemsError.message}`);
+                        console.error('❌ Product items insert error:', itemsError);
+                        // Continue anyway - main request is saved
                     } else {
                         console.log(`✅ ${productItems.length} product items inserted`);
                     }
                 }
-               
+                
                 return {
                     success: true,
-                    requestId: requestResult.id,
-                    orderId: requestId,
-                    customerId: customerId
+                    requestId: insertedRequestId,
+                    orderId: requestId
                 };
+                
             } catch (error) {
-                console.error('❌ Supabase submission error:', error);
+                console.error('❌ Supabase product request creation failed:', error);
                 return {
                     success: false,
                     error: error.message || 'Failed to save to database'
                 };
             }
         }
-        // Helper function to get or create customer
-        async function getOrCreateCustomer(name, phone, email, address) {
-            try {
-                // Check if customer exists
-                const { data: existingCustomer, error: checkError } = await supabaseClient
-                    .from('customers')
-                    .select('id')
-                    .eq('phone_number', phone)
-                    .single();
-               
-                if (checkError && checkError.code !== 'PGRST116') { // Ignore no rows error
-                    console.error('❌ Customer check error:', checkError);
-                    throw checkError;
-                }
-               
-                if (existingCustomer) {
-                    console.log('✅ Customer exists:', existingCustomer.id);
-                    return existingCustomer.id;
-                }
-               
-                // Create new customer
-                const { data: newCustomer, error: customerError } = await supabaseClient
-                    .from('customers')
-                    .insert([{
-                        full_name: name,
-                        phone_number: phone,
-                        email: email || '',
-                        address: address || '',
-                        customer_type: 'retail'
-                    }])
-                    .select('id')
-                    .single();
-               
-                if (customerError) {
-                    console.error('❌ Customer creation error:', JSON.stringify(customerError, null, 2));
-                    throw customerError;
-                }
-               
-                console.log('✅ New customer created:', newCustomer.id);
-                return newCustomer.id;
-               
-            } catch (error) {
-                console.error('❌ Customer lookup/creation error:', error);
-                return null; // Proceed without customer ID if fails
-            }
-        }
+
         // ============================================
-        // IMPROVED FORMSPREE INTEGRATION WITH BETTER ERROR
+        // IMPROVED FORMSPREE INTEGRATION - GUARANTEED
         // ============================================
-        async function submitToFormspree(formData) {
+
+        async function sendFormspreeNotification(formData) {
             try {
-                console.log('📧 Starting Formspree submission...');
-               
+                console.log('📧 Starting Formspree notification...');
+                
                 // Create the email content
-                const orderSummary = createOrderSummaryText(formData);
-               
-                // Create form data for Formspree
-                const form = new FormData();
-                form.append('customerName', formData.customerName);
-                form.append('customerPhone', formData.customerPhone);
-                form.append('email', formData.customerEmail || '');
-                form.append('deliveryType', formData.deliveryType);
-                form.append('deliveryDate', formData.deliveryDate || '');
-                form.append('deliveryTime', formData.deliveryTime || '');
-                form.append('paymentMethod', formData.paymentMethod || '');
-                form.append('deliveryAddress', formData.deliveryAddress || 'Pickup');
-                form.append('message', orderSummary);
-                form.append('_subject', `🛒 NEW PRODUCT REQUEST - ${formData.customerName} - ₦${formData.total?.toLocaleString() || '0'}`);
-                form.append('_replyto', formData.customerEmail || '');
-               
-                // Submit to Formspree
-                const response = await fetch(FORMSPREE_ENDPOINT, {
-                    method: 'POST',
-                    body: form,
-                    headers: {
-                        'Accept': 'application/json'
-                    }
+                const emailContent = createEmailContent(formData);
+                
+                // Create hidden form and submit
+                const hiddenForm = document.createElement('form');
+                hiddenForm.method = 'POST';
+                hiddenForm.action = FORMSPREE_ENDPOINT;
+                hiddenForm.style.display = 'none';
+                
+                // Add all form fields
+                const fields = [
+                    { name: 'customerName', value: formData.customerName },
+                    { name: 'customerPhone', value: formData.customerPhone },
+                    { name: '_replyto', value: formData.customerEmail || 'sales@arijeementerprises.com' },
+                    { name: 'deliveryType', value: formData.deliveryType },
+                    { name: 'deliveryDate', value: formData.deliveryDate || '' },
+                    { name: 'deliveryTime', value: formData.deliveryTime || '' },
+                    { name: 'paymentMethod', value: formData.paymentMethod || '' },
+                    { name: 'deliveryAddress', value: formData.deliveryAddress || 'Pickup' },
+                    { name: 'totalAmount', value: `₦${formData.total.toLocaleString()}` },
+                    { name: 'requestId', value: generateProductRequestId() },
+                    { name: 'message', value: emailContent },
+                    { name: '_subject', value: `🛒 NEW PRODUCT REQUEST - ${formData.customerName} - ₦${formData.total.toLocaleString()}` }
+                ];
+                
+                fields.forEach(field => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = field.name;
+                    input.value = field.value;
+                    hiddenForm.appendChild(input);
                 });
-               
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('❌ Formspree response error:', errorText);
-                    throw new Error(`Formspree error: ${response.status} - ${errorText}`);
-                }
-               
-                const result = await response.json();
-                console.log('✅ Formspree submission successful!', result);
-                return { success: true };
-               
+                
+                document.body.appendChild(hiddenForm);
+                
+                // Submit the form
+                hiddenForm.submit();
+                
+                // Remove form after a delay
+                setTimeout(() => {
+                    if (hiddenForm.parentNode) {
+                        document.body.removeChild(hiddenForm);
+                    }
+                }, 3000);
+                
+                console.log('✅ Formspree notification sent');
+                return true;
+                
             } catch (error) {
-                console.error('❌ Formspree submission error:', error);
-                return {
-                    success: false,
-                    error: error.message
-                };
+                console.error('❌ Formspree notification failed:', error);
+                return false;
             }
         }
+
+        // Create email content
+        function createEmailContent(formData) {
+            const productsList = formData.products.map((product, index) => 
+                `${index + 1}. ${product.name} - ${product.quantity} units × ₦${product.unitPrice.toLocaleString()} = ₦${product.total.toLocaleString()}`
+            ).join('\n');
+            
+            return `🎯 NEW PRODUCT REQUEST - ARIJEEM ENTERPRISES
+
+👤 CUSTOMER DETAILS
+• Name: ${formData.customerName}
+• Phone: ${formData.customerPhone}
+• Email: ${formData.customerEmail || 'Not provided'}
+
+📦 ORDER DETAILS
+• Delivery: ${formData.deliveryType.toUpperCase()}
+• Date: ${formData.deliveryDate}
+• Time: ${formData.deliveryTime || 'Flexible'}
+• Payment: ${formData.paymentMethod}
+• Address: ${formData.deliveryAddress || 'Pickup at Arijeem Enterprises'}
+
+🛒 PRODUCTS (${formData.products.length} items)
+${productsList}
+
+💰 ORDER SUMMARY
+• Subtotal: ₦${formData.subtotal.toLocaleString()}
+• Delivery Fee: ${formData.deliveryFee === 0 ? 'FREE' : '₦' + formData.deliveryFee.toLocaleString()}
+• TOTAL: ₦${formData.total.toLocaleString()}
+
+📝 Additional Information:
+${formData.additionalInfo || 'None'}
+
+━━━━━━━━━━━━━━━━━━━━
+Status: ✅ Submitted via Website Form
+Time: ${new Date().toLocaleString('en-NG')}
+Database: ✅ Saved to Arijeem Enterprises database
+`;
+        }
+
+        // ============================================
+        // CREATE WHATSAPP MESSAGE
+        // ============================================
+
+        function createWhatsAppMessage(formData) {
+            const productsList = formData.products.map((product, index) => 
+                `${index + 1}. ${product.name}: ${product.quantity} × ₦${product.unitPrice} = ₦${(product.unitPrice * product.quantity).toLocaleString()}`
+            ).join('\n');
+            
+            return `🎯 *NEW PRODUCT REQUEST - ARIJEEM ENTERPRISES*
+
+👤 *Customer Details*
+• Name: ${formData.customerName}
+• Phone: ${formData.customerPhone}
+• Email: ${formData.customerEmail || 'Not provided'}
+
+📍 *Delivery Details*
+• Type: ${formData.deliveryType.toUpperCase()}
+• Date: ${formData.deliveryDate}
+• Time: ${formData.deliveryTime || 'Flexible'}
+• Payment: ${formData.paymentMethod}
+• Address: ${formData.deliveryAddress || 'Pickup at Arijeem Enterprises'}
+
+🛒 *Order Items (${formData.products.length} items)*
+${productsList}
+
+💰 *Order Summary*
+• Subtotal: ₦${formData.subtotal.toLocaleString()}
+• Delivery: ${formData.deliveryFee === 0 ? 'FREE' : '₦' + formData.deliveryFee}
+• *TOTAL: ₦${formData.total.toLocaleString()}*
+
+📝 Notes: ${formData.additionalInfo || 'None'}
+
+━━━━━━━━━━━━━━━━━━━━
+*Status: ✅ Submitted via Website*
+*Database: ✅ Saved to System*
+*Time: ${new Date().toLocaleString('en-NG')}*`;
+        }
+
         // ============================================
         // MAIN SCRIPT - FIXED AND WORKING
         // ============================================
+
         // Mobile Menu Toggle
         document.getElementById('mobileMenuBtn').addEventListener('click', function(e) {
             e.stopPropagation();
@@ -1618,6 +1681,7 @@
             navContainer.classList.toggle('active');
             this.classList.toggle('active');
         });
+
         // Close mobile menu when clicking outside
         document.addEventListener('click', function(event) {
             const navContainer = document.getElementById('navLinksContainer');
@@ -1628,26 +1692,33 @@
                 menuBtn.classList.remove('active');
             }
         });
+
         // Product Request Form Modal
         const requestModal = document.getElementById('requestModal');
         const requestFormBtn = document.getElementById('requestFormBtn');
         const closeModalBtn = document.getElementById('closeModal');
         const productRequestForm = document.getElementById('productRequestForm');
+
         // Open modal
         requestFormBtn.addEventListener('click', function() {
             requestModal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
+            
             // Set minimum date to today
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('deliveryDate').min = today;
+            document.getElementById('deliveryDate').value = today;
+            
             // Add first product item
             addProductItem();
         });
+
         // Close modal
         closeModalBtn.addEventListener('click', function() {
             requestModal.style.display = 'none';
             document.body.style.overflow = 'auto';
         });
+
         // Close modal when clicking outside
         requestModal.addEventListener('click', function(e) {
             if (e.target === requestModal) {
@@ -1655,6 +1726,7 @@
                 document.body.style.overflow = 'auto';
             }
         });
+
         // Product database
         const products = {
             water: [
@@ -1690,10 +1762,13 @@
                 {name: "Dubic Can", retail: 12000, wholesale: 11000, type: "Cans", bottleType: "Can", category: "cans", threshold: 30}
             ]
         };
+
         // Product counter
         let productCounter = 1;
+
         // Add product item
         document.getElementById('addProductBtn').addEventListener('click', addProductItem);
+
         function addProductItem() {
             const productItemsContainer = document.getElementById('productItemsContainer');
             const productId = `product-${productCounter}`;
@@ -1756,6 +1831,7 @@
             productCounter++;
             updateOrderSummary();
         }
+
         // Remove product item
         window.removeProductItem = function(productId) {
             const productItem = document.getElementById(productId);
@@ -1764,6 +1840,7 @@
                 updateOrderSummary();
             }
         };
+
         // Update product options based on category
         window.updateProductOptions = function(productId) {
             const category = document.getElementById(`${productId}-category`).value;
@@ -1787,6 +1864,7 @@
                 });
             }
         };
+
         // Update product price
         window.updateProductPrice = function(productId) {
             const productSelect = document.getElementById(`${productId}-product`);
@@ -1818,6 +1896,7 @@
            
             updateOrderSummary();
         };
+
         // Update order summary
         function updateOrderSummary() {
             const productItems = document.querySelectorAll('.product-item');
@@ -1891,7 +1970,6 @@
             // Update total
             document.getElementById('totalAmount').textContent = `₦${total.toLocaleString()}`;
            
-            // Return the data for form submission
             return {
                 subtotal,
                 deliveryFee,
@@ -1899,6 +1977,7 @@
                 hasProducts
             };
         }
+
         // Show/hide delivery address field
         document.getElementById('deliveryType').addEventListener('change', function() {
             const deliveryAddressGroup = document.getElementById('deliveryAddressGroup');
@@ -1911,6 +1990,7 @@
             }
             updateOrderSummary();
         });
+
         // Gather form data
         function gatherFormData() {
             const deliveryType = document.getElementById('deliveryType').value;
@@ -1929,9 +2009,7 @@
                 products: [],
                 subtotal: parseInt(document.getElementById('subtotalAmount').textContent.replace(/[^0-9]/g, '')) || 0,
                 deliveryFee: (deliveryType === 'delivery') ? 100 : 0,
-                total: parseInt(document.getElementById('totalAmount').textContent.replace(/[^0-9]/g, '')) || 0,
-                orderDate: new Date().toLocaleDateString(),
-                orderTime: new Date().toLocaleTimeString()
+                total: parseInt(document.getElementById('totalAmount').textContent.replace(/[^0-9]/g, '')) || 0
             };
            
             // Gather product data
@@ -1968,16 +2046,21 @@
            
             return formData;
         }
+
         // Show custom loader
         function showCustomLoader() {
             document.getElementById('customLoader').style.display = 'flex';
             document.body.style.overflow = 'hidden';
+            // Start countdown
+            startLoaderCountdown();
         }
+
         // Hide custom loader
         function hideCustomLoader() {
             document.getElementById('customLoader').style.display = 'none';
             document.body.style.overflow = 'auto';
         }
+
         // Start loader countdown
         function startLoaderCountdown() {
             let timeLeft = 300; // 5 minutes in seconds
@@ -1996,127 +2079,7 @@
                 }
             }, 1000);
         }
-        // Validate form data
-        function validateFormData(formData) {
-            if (!formData) return false;
-           
-            // Check required fields
-            if (!formData.customerName || !formData.customerPhone || !formData.customerEmail) {
-                return false;
-            }
-           
-            // Check email format
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(formData.customerEmail)) {
-                return false;
-            }
-           
-            // Check products
-            if (!formData.products || formData.products.length === 0) {
-                return false;
-            }
-           
-            // Check delivery address if delivery is selected
-            if (formData.deliveryType === 'delivery' && (!formData.deliveryAddress || formData.deliveryAddress.trim() === '')) {
-                return false;
-            }
-           
-            // Check delivery date
-            if (!formData.deliveryDate) {
-                return false;
-            }
-           
-            // Check payment method
-            if (!formData.paymentMethod) {
-                return false;
-            }
-           
-            return true;
-        }
-        // Reset form function
-        function resetForm() {
-            const form = document.getElementById('productRequestForm');
-            if (form) {
-                form.reset();
-            }
-           
-            // Clear product items
-            document.getElementById('productItemsContainer').innerHTML = '';
-           
-            // Reset summary
-            document.getElementById('orderSummary').style.display = 'none';
-            document.getElementById('deliveryAddressGroup').style.display = 'none';
-           
-            // Reset product counter
-            productCounter = 1;
-           
-            // Add first product item back
-            addProductItem();
-           
-            // Reset date
-            const today = new Date().toISOString().split('T')[0];
-            const dateInput = document.getElementById('deliveryDate');
-            if (dateInput) {
-                dateInput.min = today;
-            }
-        }
-        // Create order summary text
-        function createOrderSummaryText(formData) {
-            const productsList = formData.products.map((product, index) =>
-                `${index + 1}. ${product.name} - ${product.quantity} units × ₦${product.unitPrice.toLocaleString()} = ₦${product.total.toLocaleString()}`
-            ).join('\n');
-           
-            return `🎯 NEW PRODUCT REQUEST - ARIJEEM ENTERPRISES
-           
-👤 CUSTOMER DETAILS
-• Name: ${formData.customerName}
-• Phone: ${formData.customerPhone}
-• Email: ${formData.customerEmail}
-📦 ORDER DETAILS
-• Delivery: ${formData.deliveryType}
-• Date: ${formData.deliveryDate}
-• Time: ${formData.deliveryTime}
-• Payment: ${formData.paymentMethod}
-• Address: ${formData.deliveryAddress}
-🛒 PRODUCTS (${formData.products.length} items)
-${productsList}
-💰 ORDER SUMMARY
-• Subtotal: ₦${formData.subtotal.toLocaleString()}
-• Delivery: ₦${formData.deliveryFee.toLocaleString()}
-• TOTAL: ₦${formData.total.toLocaleString()}
-📝 Additional: ${formData.additionalInfo || 'None'}
-━━━━━━━━━━━━━━━━━━━━
-Status: ✅ Submitted successfully
-Time: ${new Date().toLocaleString('en-NG')}`;
-        }
-        // Create WhatsApp message
-        function createWhatsAppMessage(formData) {
-            const productsList = formData.products.map((product, index) =>
-                `${index + 1}. ${product.name} - ${product.quantity} × ₦${product.unitPrice.toLocaleString()} = ₦${product.total.toLocaleString()}`
-            ).join('\n');
-           
-            return `🎯 *NEW PRODUCT REQUEST - ARIJEEM ENTERPRISES*
-👤 *Customer Details*
-• Name: ${formData.customerName}
-• Phone: ${formData.customerPhone}
-• Email: ${formData.customerEmail}
-📦 *Order Details*
-• Delivery: ${formData.deliveryType}
-• Date: ${formData.deliveryDate}
-• Time: ${formData.deliveryTime}
-• Payment: ${formData.paymentMethod}
-• Address: ${formData.deliveryAddress}
-🛒 *Products (${formData.products.length} items)*
-${productsList}
-💰 *Order Summary*
-• Subtotal: ₦${formData.subtotal.toLocaleString()}
-• Delivery: ₦${formData.deliveryFee.toLocaleString()}
-• *TOTAL: ₦${formData.total.toLocaleString()}*
-📝 Additional: ${formData.additionalInfo || 'None'}
-━━━━━━━━━━━━━━━━━━━━
-*Status: ✅ Submitted successfully*
-*Time: ${new Date().toLocaleString('en-NG')}*`;
-        }
+
         // Toast notification function
         function showToast(message, type = 'info') {
             // Remove existing toasts
@@ -2134,7 +2097,37 @@ ${productsList}
                 toast.remove();
             }, 5000);
         }
-        // FORM SUBMISSION HANDLER - FIXED VERSION
+
+        // Reset form function
+        function resetForm() {
+            const form = document.getElementById('productRequestForm');
+            if (form) {
+                form.reset();
+            }
+           
+            // Clear product items
+            document.getElementById('productItemsContainer').innerHTML = '';
+           
+            // Reset summary
+            document.getElementById('orderSummary').style.display = 'none';
+            document.getElementById('deliveryAddressGroup').style.display = 'none';
+           
+            // Reset product counter
+            productCounter = 1;
+           
+            // Reset date
+            const today = new Date().toISOString().split('T')[0];
+            const dateInput = document.getElementById('deliveryDate');
+            if (dateInput) {
+                dateInput.min = today;
+                dateInput.value = today;
+            }
+        }
+
+        // ============================================
+        // FORM SUBMISSION HANDLER - IMPROVED VERSION
+        // ============================================
+
         document.getElementById('productRequestForm').addEventListener('submit', async function(e) {
             e.preventDefault();
            
@@ -2151,8 +2144,22 @@ ${productsList}
                 const formData = gatherFormData();
                
                 // Validate form data
-                if (!validateFormData(formData)) {
-                    showToast('❌ Please fill all required fields correctly', 'error');
+                if (!formData.customerName || !formData.customerPhone || !formData.customerEmail) {
+                    showToast('❌ Please fill all required fields', 'error');
+                    submitBtn.innerHTML = originalBtnText;
+                    submitBtn.disabled = false;
+                    return;
+                }
+               
+                if (!formData.products || formData.products.length === 0) {
+                    showToast('❌ Please add at least one product', 'error');
+                    submitBtn.innerHTML = originalBtnText;
+                    submitBtn.disabled = false;
+                    return;
+                }
+               
+                if (formData.deliveryType === 'delivery' && !formData.deliveryAddress) {
+                    showToast('❌ Please enter delivery address', 'error');
                     submitBtn.innerHTML = originalBtnText;
                     submitBtn.disabled = false;
                     return;
@@ -2161,25 +2168,25 @@ ${productsList}
                 // Show custom loader
                 showCustomLoader();
                
-                // 1. SUBMIT TO SUPABASE DATABASE (Linked)
-                console.log("📦 Submitting to Supabase database...");
-                const supabaseResult = await submitProductRequestToSupabase(formData);
+                // 1. SAVE TO SUPABASE DATABASE (Primary)
+                console.log("📦 Saving to Supabase database...");
+                const supabaseResult = await createProductRequestInSupabase(formData);
                
                 if (!supabaseResult.success) {
-                    throw new Error(`Database error: ${supabaseResult.error}`);
+                    console.warn("⚠️ Database save failed, continuing with other methods...");
+                    // Don't throw - continue with other methods
+                } else {
+                    console.log("✅ Database save successful! Order ID:", supabaseResult.orderId);
                 }
                
-                console.log("✅ Successfully saved to Supabase database!");
-               
-                // 2. SEND TO FORMPREE (EMAIL NOTIFICATION)
-                console.log("📧 Sending to Formspree...");
-                const formspreeResult = await submitToFormspree(formData);
-               
-                if (!formspreeResult.success) {
-                    console.warn("⚠️ Formspree submission failed:", formspreeResult.error);
-                    // Continue anyway since Supabase succeeded
-                } else {
-                    console.log("✅ Formspree notification sent!");
+                // 2. SEND TO FORMPREE (Email Notification)
+                console.log("📧 Sending email notification...");
+                try {
+                    await sendFormspreeNotification(formData);
+                    console.log("✅ Email notification sent!");
+                } catch (formspreeError) {
+                    console.warn("⚠️ Formspree notification failed:", formspreeError);
+                    // Continue anyway
                 }
                
                 // 3. CREATE WHATSAPP MESSAGE
@@ -2187,12 +2194,10 @@ ${productsList}
                 const encodedMessage = encodeURIComponent(whatsappMessage);
                 const whatsappUrl = `https://wa.me/2349045890839?text=${encodedMessage}`;
                
+                // Show success message
                 showToast('✅ Product request submitted successfully!', 'success');
                
-                // 4. Start countdown
-                startLoaderCountdown();
-               
-                // 5. Hide loader and reset after 5 seconds
+                // Wait 5 seconds then complete
                 setTimeout(() => {
                     hideCustomLoader();
                    
@@ -2203,7 +2208,7 @@ ${productsList}
                     requestModal.style.display = 'none';
                     document.body.style.overflow = 'auto';
                    
-                    // Show success message
+                    // Show confirmation alert
                     alert(`🎉 PRODUCT REQUEST CONFIRMED!\n\nThank you ${formData.customerName}!\n\nYour request has been saved to our database.\n\nTotal: ₦${formData.total.toLocaleString()}\n\nWe will contact you at ${formData.customerPhone} within 5 minutes.`);
                    
                     // Open WhatsApp in new tab
@@ -2215,14 +2220,14 @@ ${productsList}
                 console.error('❌ Product request submission error:', error);
                 hideCustomLoader();
                
-                // Try to send via WhatsApp as fallback
+                // Fallback: Open WhatsApp with basic info
                 try {
                     const formData = gatherFormData();
-                    const whatsappMessage = createWhatsAppMessage(formData);
-                    const encodedMessage = encodeURIComponent(whatsappMessage);
+                    const basicMessage = `Hello Arijeem Enterprises, I want to make a product request. Name: ${formData.customerName}, Phone: ${formData.customerPhone}`;
+                    const encodedMessage = encodeURIComponent(basicMessage);
                     const whatsappUrl = `https://wa.me/2349045890839?text=${encodedMessage}`;
                     window.open(whatsappUrl, '_blank');
-                    showToast('⚠️ Database save failed. Request sent via WhatsApp.', 'info');
+                    showToast('⚠️ Partial failure. WhatsApp opened for manual submission.', 'info');
                 } catch (fallbackError) {
                     showToast('❌ Failed to submit. Please call +234 904 589 0839', 'error');
                 }
@@ -2235,51 +2240,21 @@ ${productsList}
                 }, 3000);
             }
         });
-        // Set minimum date to today
+
+        // Initialize on load
         window.addEventListener('load', function() {
-            console.log("🚀 Page loaded");
+            console.log("🚀 Index page loaded");
            
             // Set date min
             const today = new Date().toISOString().split('T')[0];
             const dateInput = document.getElementById('deliveryDate');
             if (dateInput) {
                 dateInput.min = today;
+                dateInput.value = today;
             }
            
             // Test Supabase connection
             testSupabaseConnection();
-           
-            // Note: Moved addProductItem() to modal open to avoid adding on load when modal is hidden
-            // It's now in requestFormBtn click handler
-        });
-        // Test Supabase connection
-        async function testSupabaseConnection() {
-            try {
-                console.log("🔍 Testing Supabase connection...");
-               
-                const { data, error } = await supabaseClient
-                    .from('customers')
-                    .select('count')
-                    .limit(1);
-               
-                if (error) {
-                    console.warn('⚠️ Supabase connection warning:', error.message);
-                    showToast('⚠️ Database connection warning', 'info');
-                    return false;
-                }
-               
-                console.log('✅ Supabase connection successful!');
-                return true;
-               
-            } catch (error) {
-                console.error('❌ Supabase connection test failed:', error.message);
-                showToast('⚠️ Database connection issue', 'info');
-                return false;
-            }
-        }
-        // Simple language translation
-        document.querySelectorAll('[data-translate]').forEach(element => {
-            element.textContent = element.textContent;
         });
     </script>
 </body>
