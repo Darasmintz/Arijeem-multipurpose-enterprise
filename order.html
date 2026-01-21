@@ -1286,6 +1286,7 @@
                         <button class="category-tab rgb" data-category="rgb">RGB Glass Bottles</button>
                         <button class="category-tab pet" data-category="pet">PET Plastic Bottles</button>
                         <button class="category-tab cans" data-category="cans">Beverage Cans</button>
+                        <button class="category-tab" data-category="energy">Energy Drinks</button>
                     </div>
                 </div>
                 
@@ -1491,7 +1492,7 @@
     
     <script>
         // ============================================
-        // COMPLETE SYSTEM: Database + Formspree + WhatsApp
+        // COMPLETE SYSTEM WITH ALL PRODUCTS INCLUDING BLACKHOOD AND BIG 25ml
         // ============================================
 
         // Your Supabase credentials
@@ -1501,7 +1502,7 @@
         // Initialize Supabase client
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Product Data
+        // COMPLETE Product Data with ALL products including Blackhood and BIG 25ml
         const products = {
             water: [
                 { 
@@ -1784,23 +1785,23 @@
             energy: [
                 {
                     id: 30,
-                    name: "BIG 25ml",
+                    name: "BIG 25ml Energy Drink",
                     type: "Energy",
-                    retailPrice: 0,
-                    wholesalePrice: 0,
-                    minWholesale: 1,
-                    image: "big-energy.png",
-                    description: "Energy drink - Price varies per order"
+                    retailPrice: 800,
+                    wholesalePrice: 700,
+                    minWholesale: 24,
+                    image: "big-25ml.png",
+                    description: "BIG 25ml Energy Drink - High energy boost"
                 },
                 {
                     id: 31,
-                    name: "Blackhood",
+                    name: "Blackhood Energy Drink",
                     type: "Energy",
-                    retailPrice: 0,
-                    wholesalePrice: 0,
-                    minWholesale: 1,
+                    retailPrice: 850,
+                    wholesalePrice: 750,
+                    minWholesale: 24,
                     image: "blackhood.png",
-                    description: "Energy drink - Price varies per order"
+                    description: "Blackhood Energy Drink - Premium energy boost"
                 }
             ]
         };
@@ -2822,6 +2823,8 @@ ${itemsList}
             
             console.log('✅ Order page initialized successfully');
             console.log('📊 Systems ready: Supabase Database + Formspree Email + WhatsApp');
+            console.log('🛒 Products loaded: ' + Object.keys(products).reduce((total, cat) => total + products[cat].length, 0) + ' total products');
+            console.log('⚡ Energy Drinks available: BIG 25ml and Blackhood Energy Drink');
         }
 
         document.addEventListener('DOMContentLoaded', init);
