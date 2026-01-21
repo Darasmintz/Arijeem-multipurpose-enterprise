@@ -1555,15 +1555,15 @@
             <div class="auth-form-section">
                 <!-- Tabs -->
                 <div class="form-tabs">
-                    <div class="form-tab active" data-tab="login">Login</div>
-                    <div class="form-tab" data-tab="signup">Create Account</div>
+                    <div class="form-tab" data-tab="login">Login</div>
+                    <div class="form-tab active" data-tab="signup">Create Account</div>
                 </div>
                 
                 <!-- Messages -->
                 <div class="auth-message" id="authMessage"></div>
                 
                 <!-- Login Form -->
-                <form id="loginForm" class="auth-form active">
+                <form id="loginForm" class="auth-form">
                     <div class="auth-form-group">
                         <label for="loginEmail"><i class="fas fa-envelope"></i> Email Address</label>
                         <input type="email" id="loginEmail" class="auth-form-control" placeholder="Enter your email" required>
@@ -1591,7 +1591,7 @@
                 </form>
                 
                 <!-- Signup Form -->
-                <form id="signupForm" class="auth-form">
+                <form id="signupForm" class="auth-form active">
                     <div class="auth-form-group">
                         <label for="signupName"><i class="fas fa-user"></i> Full Name</label>
                         <input type="text" id="signupName" class="auth-form-control" placeholder="Enter your full name" required>
@@ -2016,13 +2016,13 @@
     
     <script>
         // ============================================
-        // GLOBAL VARIABLES - FIXED DUPLICATE DECLARATION
+        // GLOBAL VARIABLES
         // ============================================
         const SUPABASE_URL = 'https://twnbpdqssvzuvdlfzdum.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3bmJwZHFzc3Z6dXZkbGZ6ZHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyNzQ0NzAsImV4cCI6MjA4Mzg1MDQ3MH0.XfPvPh4YZDES5gktKkj5KHtHmNTZmjye8LfDkBbpX-U';
         const FORMSPREE_ENDPOINT = 'https://formspree.io/f/maqqyqpd';
         
-        // Initialize Supabase - ONLY ONCE
+        // Initialize Supabase
         let supabase;
         try {
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -2039,13 +2039,12 @@
         // AUTHENTICATION SYSTEM
         // ============================================
         
-        // Initialize auth on page load
-        document.addEventListener('DOMContentLoaded', async function() {
-            await initAuthSystem();
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing...');
+            initAuthSystem();
             initWebsiteFunctionality();
-            
-            // Initialize auth UI controls
-            initAuthControls();
+            initAuthControls(); // Initialize auth controls immediately
         });
 
         // Initialize auth system
@@ -2058,16 +2057,22 @@
                 // Check for existing session
                 const { data, error } = await supabase.auth.getSession();
                 
-                if (error) throw error;
+                if (error) {
+                    console.error('Session error:', error);
+                    showAuthScreen();
+                    return;
+                }
                 
                 if (data.session) {
                     // User is already logged in
                     currentUser = data.session.user;
+                    console.log('User logged in:', currentUser.email);
                     showMainWebsite();
                     updateUIForUser();
                     showToast('Welcome back!', 'success');
                 } else {
-                    // Show auth screen for new visitors
+                    // Show auth screen for new visitors - START WITH CREATE ACCOUNT
+                    console.log('No session, showing auth screen');
                     showAuthScreen();
                 }
                 
@@ -2095,30 +2100,40 @@
             }
         }
 
-        // Initialize auth controls
+        // Initialize auth controls - FIXED VERSION
         function initAuthControls() {
+            console.log('Initializing auth controls...');
+            
             // Tab switching
-            document.querySelectorAll('.form-tab').forEach(tab => {
-                tab.addEventListener('click', function() {
-                    const tabName = this.dataset.tab;
+            const tabs = document.querySelectorAll('.form-tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const tabName = this.getAttribute('data-tab');
+                    console.log('Tab clicked:', tabName);
                     switchAuthTab(tabName);
                     clearAuthMessage();
                 });
             });
 
-            // Form switching
-            document.querySelectorAll('.switch-form').forEach(button => {
-                button.addEventListener('click', function() {
-                    const switchTo = this.dataset.switchTo;
+            // Form switching buttons
+            const switchButtons = document.querySelectorAll('.switch-form');
+            switchButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const switchTo = this.getAttribute('data-switch-to');
+                    console.log('Switch to:', switchTo);
                     switchAuthTab(switchTo);
                     clearAuthMessage();
                 });
             });
 
-            // Password toggle
-            document.querySelectorAll('.toggle-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const targetId = this.dataset.target;
+            // Password toggle buttons
+            const toggleButtons = document.querySelectorAll('.toggle-btn');
+            toggleButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('data-target');
                     const passwordInput = document.getElementById(targetId);
                     const icon = this.querySelector('i');
                     
@@ -2135,7 +2150,9 @@
             // Skip button
             const skipBtn = document.getElementById('skipBtn');
             if (skipBtn) {
-                skipBtn.addEventListener('click', function() {
+                skipBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('Skip button clicked');
                     if (confirm("You'll have limited access as a guest. Login or sign up for full features including order history. Continue as guest?")) {
                         handleGuestAccess();
                     }
@@ -2147,6 +2164,7 @@
             if (loginForm) {
                 loginForm.addEventListener('submit', function(e) {
                     e.preventDefault();
+                    console.log('Login form submitted');
                     
                     const email = document.getElementById('loginEmail').value;
                     const password = document.getElementById('loginPassword').value;
@@ -2170,6 +2188,7 @@
             if (signupForm) {
                 signupForm.addEventListener('submit', function(e) {
                     e.preventDefault();
+                    console.log('Signup form submitted');
                     
                     const name = document.getElementById('signupName').value.trim();
                     const email = document.getElementById('signupEmail').value.trim();
@@ -2205,25 +2224,39 @@
 
         // Show auth screen
         function showAuthScreen() {
+            console.log('Showing auth screen');
             const authScreen = document.getElementById('authScreen');
             const mainWebsite = document.getElementById('mainWebsite');
             
-            if (authScreen) authScreen.classList.remove('hidden');
-            if (mainWebsite) mainWebsite.classList.remove('active');
+            if (authScreen) {
+                authScreen.classList.remove('hidden');
+            }
+            if (mainWebsite) {
+                mainWebsite.classList.remove('active');
+            }
+            
+            // Start with Create Account tab
+            switchAuthTab('signup');
             clearAuthMessage();
         }
 
         // Show main website
         function showMainWebsite() {
+            console.log('Showing main website');
             const authScreen = document.getElementById('authScreen');
             const mainWebsite = document.getElementById('mainWebsite');
             
-            if (authScreen) authScreen.classList.add('hidden');
-            if (mainWebsite) mainWebsite.classList.add('active');
+            if (authScreen) {
+                authScreen.classList.add('hidden');
+            }
+            if (mainWebsite) {
+                mainWebsite.classList.add('active');
+            }
         }
 
         // Update UI for logged in user
         function updateUIForUser() {
+            console.log('Updating UI for user:', currentUser?.email);
             const userBtnText = document.getElementById('userBtnText');
             const userEmail = document.getElementById('userEmail');
             
@@ -2284,6 +2317,7 @@
             if (authMessage) {
                 authMessage.textContent = message;
                 authMessage.className = 'auth-message error active';
+                console.log('Auth error:', message);
             }
         }
 
@@ -2293,6 +2327,7 @@
             if (authMessage) {
                 authMessage.textContent = message;
                 authMessage.className = 'auth-message success active';
+                console.log('Auth success:', message);
             }
         }
 
@@ -2317,6 +2352,7 @@
                     loginBtn.innerHTML = '<span class="spinner"></span> Logging in...';
                     loginBtn.disabled = true;
                     
+                    console.log('Attempting login for:', email);
                     const { data, error } = await supabase.auth.signInWithPassword({
                         email: email.trim(),
                         password: password
@@ -2324,6 +2360,7 @@
                     
                     if (error) throw error;
                     
+                    console.log('Login successful:', data);
                     showAuthSuccess('✅ Login successful! Welcome back.');
                 }
                 
@@ -2359,6 +2396,7 @@
                     signupBtn.innerHTML = '<span class="spinner"></span> Creating account...';
                     signupBtn.disabled = true;
                     
+                    console.log('Attempting signup for:', email);
                     const { data, error } = await supabase.auth.signUp({
                         email: email.trim(),
                         password: password,
@@ -2372,6 +2410,8 @@
                     });
                     
                     if (error) throw error;
+                    
+                    console.log('Signup response:', data);
                     
                     if (data.user && data.session) {
                         // Auto-login if session is returned
@@ -2443,29 +2483,40 @@
             showToast('Welcome! You are browsing as a guest.', 'info');
         }
 
-        // Switch auth tab
+        // Switch auth tab - FIXED VERSION
         function switchAuthTab(tabName) {
+            console.log('Switching to tab:', tabName);
+            
             // Update tabs
-            document.querySelectorAll('.form-tab').forEach(t => {
-                t.classList.remove('active');
+            const tabs = document.querySelectorAll('.form-tab');
+            tabs.forEach(t => {
+                if (t.getAttribute('data-tab') === tabName) {
+                    t.classList.add('active');
+                } else {
+                    t.classList.remove('active');
+                }
             });
-            const activeTab = document.querySelector(`.form-tab[data-tab="${tabName}"]`);
-            if (activeTab) activeTab.classList.add('active');
             
             // Update forms
-            document.querySelectorAll('.auth-form').forEach(form => {
-                form.classList.remove('active');
+            const forms = document.querySelectorAll('.auth-form');
+            forms.forEach(form => {
+                if (form.id === `${tabName}Form`) {
+                    form.classList.add('active');
+                } else {
+                    form.classList.remove('active');
+                }
             });
-            const activeForm = document.getElementById(`${tabName}Form`);
-            if (activeForm) activeForm.classList.add('active');
             
             // Clear form fields
             clearAuthMessage();
             
             // Focus first input
             setTimeout(() => {
-                const firstInput = document.getElementById(`${tabName}Form`)?.querySelector('input');
-                if (firstInput) firstInput.focus();
+                const form = document.getElementById(`${tabName}Form`);
+                if (form) {
+                    const firstInput = form.querySelector('input');
+                    if (firstInput) firstInput.focus();
+                }
             }, 100);
         }
 
@@ -2480,6 +2531,8 @@
         // ============================================
         
         function initWebsiteFunctionality() {
+            console.log('Initializing website functionality...');
+            
             // Mobile Menu Toggle
             const mobileMenuBtn = document.getElementById('mobileMenuBtn');
             const navLinksContainer = document.getElementById('navLinksContainer');
@@ -2605,6 +2658,8 @@
         // ============================================
         
         function initProductRequestForm() {
+            console.log('Initializing product request form...');
+            
             // Product Request Form Modal
             const requestModal = document.getElementById('requestModal');
             const requestFormBtn = document.getElementById('requestFormBtn');
